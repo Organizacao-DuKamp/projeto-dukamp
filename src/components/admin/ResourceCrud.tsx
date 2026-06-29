@@ -177,7 +177,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
     <form onSubmit={submit} className="space-y-3">
       <div className="grid sm:grid-cols-2 gap-3">
         {fields.map((f) => (
-          <div key={f.name} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
+          <div key={f.name} className={f.type === "textarea" || f.type === "image" || f.type === "imageList" ? "sm:col-span-2" : ""}>
             <Label>{f.label}</Label>
             {f.type === "textarea" ? (
               <Textarea value={values[f.name] ?? ""} onChange={(e) => handleChange(f.name, e.target.value)} rows={4} />
@@ -192,13 +192,10 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
                 <option value="">—</option>
                 {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
+            ) : f.type === "image" ? (
+              <ImageUpload value={values[f.name] ?? ""} onChange={(v) => handleChange(f.name, v)} />
             ) : f.type === "imageList" ? (
-              <Textarea
-                value={values[f.name] ?? ""}
-                onChange={(e) => handleChange(f.name, e.target.value)}
-                rows={3}
-                placeholder="Uma URL por linha"
-              />
+              <ImageListUpload value={Array.isArray(values[f.name]) ? values[f.name] : []} onChange={(v) => handleChange(f.name, v)} />
             ) : (
               <Input
                 type={f.type === "number" ? "number" : "text"}
