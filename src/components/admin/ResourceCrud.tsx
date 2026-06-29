@@ -1,0 +1,215 @@
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
+export type FieldDef = {
+  name: string;
+  label: string;
+  type?: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "imageList";
+  options?: { value: string; label: string }[];
+  required?: boolean;
+  defaultValue?: any;
+  step?: string;
+};
+
+export type ColumnDef = {
+  key: string;
+  label: string;
+  format?: (v: any, row: any) => ReactNode;
+};
+
+type Props = {
+  title: string;
+  table: string;
+  columns: ColumnDef[];
+  fields: FieldDef[];
+  orderBy?: { column: string; ascending?: boolean };
+};
+
+export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
+
+  const list = useQuery({
+    queryKey: ["admin", table],
+    queryFn: async () => {
+      let q = supabase.from(table as any).select("*");
+      if (orderBy) q = q.order(orderBy.column, { ascending: orderBy.ascending ?? true });
+      const { data, error } = await q;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const save = useMutation({
+    mutationFn: async (values: any) => {
+      if (editing?.id) {
+        const { error } = await supabase.from(table as any).update(values).eq("id", editing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from(table as any).insert(values);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", table] });
+      setOpen(false);
+      setEditing(null);
+      toast.success("Salvo!");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const del = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from(table as any).delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", table] }); toast.success("Removido"); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">{title}</h1>
+        <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setEditing(null); }}>
+          <DialogTrigger asChild>
+            <Button onClick={() => setEditing(null)}><Plus className="h-4 w-4 mr-1" /> Novo</Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-auto">
+            <DialogHeader><DialogTitle>{editing ? "Editar" : "Novo"} {title}</DialogTitle></DialogHeader>
+            <ResourceForm
+              fields={fields}
+              initial={editing}
+              onSubmit={(v) => save.mutate(v)}
+              submitting={save.isPending}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="rounded-lg border bg-card overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {columns.map((c) => <TableHead key={c.key}>{c.label}</TableHead>)}
+              <TableHead className="w-24 text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {list.data?.map((row: any) => (
+              <TableRow key={row.id}>
+                {columns.map((c) => (
+                  <TableCell key={c.key}>{c.format ? c.format(row[c.key], row) : String(row[c.key] ?? "")}</TableCell>
+                ))}
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="icon" onClick={() => { setEditing(row); setOpen(true); }}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => {
+                    if (confirm("Remover este item?")) del.mutate(row.id);
+                  }}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {list.data?.length === 0 && (
+              <TableRow><TableCell colSpan={columns.length + 1} className="text-center text-muted-foreground py-8">Nenhum registro</TableCell></TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
+
+function ResourceForm({ fields, initial, onSubmit, submitting }: {
+  fields: FieldDef[]; initial: any; onSubmit: (v: any) => void; submitting: boolean;
+}) {
+  const [values, setValues] = useState<any>(() => {
+    const v: any = {};
+    fields.forEach((f) => {
+      v[f.name] = initial?.[f.name] ?? f.defaultValue ?? (f.type === "boolean" ? false : f.type === "number" ? 0 : f.type === "imageList" ? [] : "");
+      if (f.type === "imageList" && Array.isArray(v[f.name])) v[f.name] = v[f.name].join("\n");
+    });
+    return v;
+  });
+
+  function handleChange(name: string, val: any) {
+    setValues((p: any) => ({ ...p, [name]: val }));
+  }
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const out: any = {};
+    fields.forEach((f) => {
+      let v = values[f.name];
+      if (f.type === "number") v = v === "" || v == null ? null : Number(v);
+      if (f.type === "imageList") v = String(v || "").split("\n").map((s: string) => s.trim()).filter(Boolean);
+      if (f.type === "select" && v === "") v = null;
+      if (v === "") v = null;
+      out[f.name] = v;
+    });
+    onSubmit(out);
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-3">
+      <div className="grid sm:grid-cols-2 gap-3">
+        {fields.map((f) => (
+          <div key={f.name} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
+            <Label>{f.label}</Label>
+            {f.type === "textarea" ? (
+              <Textarea value={values[f.name] ?? ""} onChange={(e) => handleChange(f.name, e.target.value)} rows={4} />
+            ) : f.type === "boolean" ? (
+              <div className="h-9 flex items-center"><Switch checked={!!values[f.name]} onCheckedChange={(v) => handleChange(f.name, v)} /></div>
+            ) : f.type === "select" ? (
+              <select
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                value={values[f.name] ?? ""}
+                onChange={(e) => handleChange(f.name, e.target.value)}
+              >
+                <option value="">—</option>
+                {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            ) : f.type === "imageList" ? (
+              <Textarea
+                value={values[f.name] ?? ""}
+                onChange={(e) => handleChange(f.name, e.target.value)}
+                rows={3}
+                placeholder="Uma URL por linha"
+              />
+            ) : (
+              <Input
+                type={f.type === "number" ? "number" : "text"}
+                step={f.step}
+                value={values[f.name] ?? ""}
+                onChange={(e) => handleChange(f.name, e.target.value)}
+                required={f.required}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      <DialogFooter>
+        <Button type="submit" disabled={submitting}>{submitting ? "Salvando..." : "Salvar"}</Button>
+      </DialogFooter>
+    </form>
+  );
+}
