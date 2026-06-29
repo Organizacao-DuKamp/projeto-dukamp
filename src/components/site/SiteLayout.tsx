@@ -12,7 +12,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <div className="container mx-auto px-4 py-6 flex-1 w-full">
         <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
           <main className="min-w-0">{children}</main>
-          <div className="lg:block">
+          <div className="hidden lg:block">
             <InstitutionalSidebar />
           </div>
         </div>
