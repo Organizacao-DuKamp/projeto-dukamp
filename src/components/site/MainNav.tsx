@@ -1,4 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { Menu } from "lucide-react";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { InstitutionalSidebar } from "./InstitutionalSidebar";
 
 const items = [
   { label: "Início", to: "/" as const },
@@ -13,10 +17,12 @@ const items = [
 ];
 
 export function MainNav() {
+  const [open, setOpen] = useState(false);
   return (
     <nav className="bg-[#0f4d2a] text-white border-b border-black/10">
       <div className="container mx-auto px-2">
-        <ul className="flex items-center gap-1 overflow-x-auto whitespace-nowrap text-sm font-medium">
+        {/* Desktop */}
+        <ul className="hidden lg:flex items-center gap-1 overflow-x-auto whitespace-nowrap text-sm font-medium">
           {items.map((it) => (
             <li key={it.label}>
               <Link
@@ -30,6 +36,38 @@ export function MainNav() {
             </li>
           ))}
         </ul>
+
+        {/* Mobile */}
+        <div className="lg:hidden flex items-center justify-between py-2">
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger className="inline-flex items-center gap-2 px-3 py-2 rounded hover:bg-white/10 text-sm font-medium">
+              <Menu className="h-5 w-5" /> Menu
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[85%] sm:w-96 overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Categorias</SheetTitle>
+              </SheetHeader>
+              <ul className="mt-4 flex flex-col">
+                {items.map((it) => (
+                  <li key={it.label}>
+                    <Link
+                      to={it.to}
+                      search={(it as any).search}
+                      onClick={() => setOpen(false)}
+                      className="block py-2.5 px-2 text-sm border-b hover:text-primary"
+                    >
+                      {it.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6">
+                <InstitutionalSidebar />
+              </div>
+            </SheetContent>
+          </Sheet>
+          <span className="text-xs uppercase tracking-wider opacity-80 pr-2">Categorias</span>
+        </div>
       </div>
     </nav>
   );
