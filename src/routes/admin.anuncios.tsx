@@ -15,7 +15,7 @@ export const Route = createFileRoute("/admin/anuncios")({
       fields={[
         { name: "title", label: "Título", required: true },
         { name: "content", label: "Conteúdo", type: "textarea" },
-        { name: "image_url", label: "URL Imagem" },
+        { name: "image_url", label: "Imagem", type: "image" },
         { name: "link_url", label: "Link" },
         { name: "sort_order", label: "Ordem", type: "number", defaultValue: 0 },
         { name: "active", label: "Ativo", type: "boolean", defaultValue: true },
