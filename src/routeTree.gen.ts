@@ -9,38 +9,179 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as CatalogosRouteImport } from './routes/catalogos'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
+import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
+import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
 
+const SobreRoute = SobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProdutosRoute = ProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContatoRoute = ContatoRouteImport.update({
+  id: '/contato',
+  path: '/contato',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogosRoute = CatalogosRouteImport.update({
+  id: '/catalogos',
+  path: '/catalogos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProdutosSlugRoute = ProdutosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProdutosRoute,
+} as any)
+const CatalogosSlugRoute = CatalogosSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CatalogosRoute,
+} as any)
+const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
+  id: '/api/public/init-admin',
+  path: '/api/public/init-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/catalogos': typeof CatalogosRouteWithChildren
+  '/contato': typeof ContatoRoute
+  '/produtos': typeof ProdutosRouteWithChildren
+  '/sobre': typeof SobreRoute
+  '/catalogos/$slug': typeof CatalogosSlugRoute
+  '/produtos/$slug': typeof ProdutosSlugRoute
+  '/api/public/init-admin': typeof ApiPublicInitAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/catalogos': typeof CatalogosRouteWithChildren
+  '/contato': typeof ContatoRoute
+  '/produtos': typeof ProdutosRouteWithChildren
+  '/sobre': typeof SobreRoute
+  '/catalogos/$slug': typeof CatalogosSlugRoute
+  '/produtos/$slug': typeof ProdutosSlugRoute
+  '/api/public/init-admin': typeof ApiPublicInitAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/catalogos': typeof CatalogosRouteWithChildren
+  '/contato': typeof ContatoRoute
+  '/produtos': typeof ProdutosRouteWithChildren
+  '/sobre': typeof SobreRoute
+  '/catalogos/$slug': typeof CatalogosSlugRoute
+  '/produtos/$slug': typeof ProdutosSlugRoute
+  '/api/public/init-admin': typeof ApiPublicInitAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/catalogos'
+    | '/contato'
+    | '/produtos'
+    | '/sobre'
+    | '/catalogos/$slug'
+    | '/produtos/$slug'
+    | '/api/public/init-admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/catalogos'
+    | '/contato'
+    | '/produtos'
+    | '/sobre'
+    | '/catalogos/$slug'
+    | '/produtos/$slug'
+    | '/api/public/init-admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/catalogos'
+    | '/contato'
+    | '/produtos'
+    | '/sobre'
+    | '/catalogos/$slug'
+    | '/produtos/$slug'
+    | '/api/public/init-admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  CatalogosRoute: typeof CatalogosRouteWithChildren
+  ContatoRoute: typeof ContatoRoute
+  ProdutosRoute: typeof ProdutosRouteWithChildren
+  SobreRoute: typeof SobreRoute
+  ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sobre': {
+      id: '/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produtos': {
+      id: '/produtos'
+      path: '/produtos'
+      fullPath: '/produtos'
+      preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contato': {
+      id: '/contato'
+      path: '/contato'
+      fullPath: '/contato'
+      preLoaderRoute: typeof ContatoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogos': {
+      id: '/catalogos'
+      path: '/catalogos'
+      fullPath: '/catalogos'
+      preLoaderRoute: typeof CatalogosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +189,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/produtos/$slug': {
+      id: '/produtos/$slug'
+      path: '/$slug'
+      fullPath: '/produtos/$slug'
+      preLoaderRoute: typeof ProdutosSlugRouteImport
+      parentRoute: typeof ProdutosRoute
+    }
+    '/catalogos/$slug': {
+      id: '/catalogos/$slug'
+      path: '/$slug'
+      fullPath: '/catalogos/$slug'
+      preLoaderRoute: typeof CatalogosSlugRouteImport
+      parentRoute: typeof CatalogosRoute
+    }
+    '/api/public/init-admin': {
+      id: '/api/public/init-admin'
+      path: '/api/public/init-admin'
+      fullPath: '/api/public/init-admin'
+      preLoaderRoute: typeof ApiPublicInitAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface CatalogosRouteChildren {
+  CatalogosSlugRoute: typeof CatalogosSlugRoute
+}
+
+const CatalogosRouteChildren: CatalogosRouteChildren = {
+  CatalogosSlugRoute: CatalogosSlugRoute,
+}
+
+const CatalogosRouteWithChildren = CatalogosRoute._addFileChildren(
+  CatalogosRouteChildren,
+)
+
+interface ProdutosRouteChildren {
+  ProdutosSlugRoute: typeof ProdutosSlugRoute
+}
+
+const ProdutosRouteChildren: ProdutosRouteChildren = {
+  ProdutosSlugRoute: ProdutosSlugRoute,
+}
+
+const ProdutosRouteWithChildren = ProdutosRoute._addFileChildren(
+  ProdutosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  CatalogosRoute: CatalogosRouteWithChildren,
+  ContatoRoute: ContatoRoute,
+  ProdutosRoute: ProdutosRouteWithChildren,
+  SobreRoute: SobreRoute,
+  ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
