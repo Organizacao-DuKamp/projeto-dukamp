@@ -43,7 +43,7 @@ function ProductsAdmin() {
         { name: "stock", label: "Estoque", type: "number", defaultValue: 0 },
         { name: "weight", label: "Peso (kg)", type: "number", step: "0.001", defaultValue: 0 },
         { name: "description", label: "Descrição", type: "textarea" },
-        { name: "images", label: "Imagens (URLs)", type: "imageList" },
+        { name: "images", label: "Imagens", type: "imageList" },
         { name: "active", label: "Ativo", type: "boolean", defaultValue: true },
         { name: "featured", label: "Destaque", type: "boolean", defaultValue: false },
       ]}

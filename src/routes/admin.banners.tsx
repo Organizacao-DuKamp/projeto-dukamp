@@ -15,7 +15,7 @@ export const Route = createFileRoute("/admin/banners")({
       fields={[
         { name: "title", label: "Título", required: true },
         { name: "subtitle", label: "Subtítulo" },
-        { name: "image_url", label: "URL Imagem", required: true },
+        { name: "image_url", label: "Imagem", type: "image", required: true },
         { name: "link_url", label: "Link" },
         { name: "sort_order", label: "Ordem", type: "number", defaultValue: 0 },
         { name: "active", label: "Ativo", type: "boolean", defaultValue: true },
