@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CatalogosRouteImport } from './routes/catalogos'
@@ -21,6 +22,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
+import { Route as AdminContasRouteImport } from './routes/admin.contas'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminCatalogosRouteImport } from './routes/admin.catalogos'
@@ -29,6 +31,7 @@ import { Route as AdminAtendimentosRouteImport } from './routes/admin.atendiment
 import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminAdministradoresRouteImport } from './routes/admin.administradores'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
+import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -38,6 +41,11 @@ const SobreRoute = SobreRouteImport.update({
 const ProdutosRoute = ProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhaContaRoute = MinhaContaRouteImport.update({
+  id: '/minha-conta',
+  path: '/minha-conta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -90,6 +98,11 @@ const AdminProdutosRoute = AdminProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminContasRoute = AdminContasRouteImport.update({
+  id: '/contas',
+  path: '/contas',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -130,6 +143,11 @@ const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   path: '/api/public/init-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminContasIdRoute = AdminContasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminContasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
+  '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/admin/administradores': typeof AdminAdministradoresRoute
@@ -147,10 +166,12 @@ export interface FileRoutesByFullPath {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/contas': typeof AdminContasRouteWithChildren
   '/admin/produtos': typeof AdminProdutosRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
 }
 export interface FileRoutesByTo {
@@ -159,6 +180,7 @@ export interface FileRoutesByTo {
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
+  '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/admin/administradores': typeof AdminAdministradoresRoute
@@ -168,10 +190,12 @@ export interface FileRoutesByTo {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/contas': typeof AdminContasRouteWithChildren
   '/admin/produtos': typeof AdminProdutosRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
 }
 export interface FileRoutesById {
@@ -182,6 +206,7 @@ export interface FileRoutesById {
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
+  '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/admin/administradores': typeof AdminAdministradoresRoute
@@ -191,10 +216,12 @@ export interface FileRoutesById {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/contas': typeof AdminContasRouteWithChildren
   '/admin/produtos': typeof AdminProdutosRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
 }
 export interface FileRouteTypes {
@@ -206,6 +233,7 @@ export interface FileRouteTypes {
     | '/catalogos'
     | '/contato'
     | '/dashboard'
+    | '/minha-conta'
     | '/produtos'
     | '/sobre'
     | '/admin/administradores'
@@ -215,10 +243,12 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/contas'
     | '/admin/produtos'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
+    | '/admin/contas/$id'
     | '/api/public/init-admin'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -227,6 +257,7 @@ export interface FileRouteTypes {
     | '/catalogos'
     | '/contato'
     | '/dashboard'
+    | '/minha-conta'
     | '/produtos'
     | '/sobre'
     | '/admin/administradores'
@@ -236,10 +267,12 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/contas'
     | '/admin/produtos'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin'
+    | '/admin/contas/$id'
     | '/api/public/init-admin'
   id:
     | '__root__'
@@ -249,6 +282,7 @@ export interface FileRouteTypes {
     | '/catalogos'
     | '/contato'
     | '/dashboard'
+    | '/minha-conta'
     | '/produtos'
     | '/sobre'
     | '/admin/administradores'
@@ -258,10 +292,12 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/contas'
     | '/admin/produtos'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
+    | '/admin/contas/$id'
     | '/api/public/init-admin'
   fileRoutesById: FileRoutesById
 }
@@ -272,6 +308,7 @@ export interface RootRouteChildren {
   CatalogosRoute: typeof CatalogosRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   DashboardRoute: typeof DashboardRoute
+  MinhaContaRoute: typeof MinhaContaRoute
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
@@ -291,6 +328,13 @@ declare module '@tanstack/react-router' {
       path: '/produtos'
       fullPath: '/produtos'
       preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minha-conta': {
+      id: '/minha-conta'
+      path: '/minha-conta'
+      fullPath: '/minha-conta'
+      preLoaderRoute: typeof MinhaContaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -363,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProdutosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/contas': {
+      id: '/admin/contas'
+      path: '/contas'
+      fullPath: '/admin/contas'
+      preLoaderRoute: typeof AdminContasRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/configuracoes': {
       id: '/admin/configuracoes'
       path: '/configuracoes'
@@ -419,8 +470,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInitAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/contas/$id': {
+      id: '/admin/contas/$id'
+      path: '/$id'
+      fullPath: '/admin/contas/$id'
+      preLoaderRoute: typeof AdminContasIdRouteImport
+      parentRoute: typeof AdminContasRoute
+    }
   }
 }
+
+interface AdminContasRouteChildren {
+  AdminContasIdRoute: typeof AdminContasIdRoute
+}
+
+const AdminContasRouteChildren: AdminContasRouteChildren = {
+  AdminContasIdRoute: AdminContasIdRoute,
+}
+
+const AdminContasRouteWithChildren = AdminContasRoute._addFileChildren(
+  AdminContasRouteChildren,
+)
 
 interface AdminRouteChildren {
   AdminAdministradoresRoute: typeof AdminAdministradoresRoute
@@ -430,6 +500,7 @@ interface AdminRouteChildren {
   AdminCatalogosRoute: typeof AdminCatalogosRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminContasRoute: typeof AdminContasRouteWithChildren
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -442,6 +513,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogosRoute: AdminCatalogosRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminContasRoute: AdminContasRouteWithChildren,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -479,6 +551,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogosRoute: CatalogosRouteWithChildren,
   ContatoRoute: ContatoRoute,
   DashboardRoute: DashboardRoute,
+  MinhaContaRoute: MinhaContaRoute,
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,

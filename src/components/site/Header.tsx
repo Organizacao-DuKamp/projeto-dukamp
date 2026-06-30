@@ -112,7 +112,7 @@ export function Header() {
                     Atendimento{!isAdmin && ticket && ticket.status !== "closed" ? " (aberto)" : ""}
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to={isAdmin ? "/admin" : "/dashboard"}><User className="h-4 w-4 mr-2" />Minha Conta</Link>
+                    <Link to="/minha-conta"><User className="h-4 w-4 mr-2" />Minha Conta</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>
