@@ -103,7 +103,7 @@ function AdminLayout() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-64 flex flex-col">
-              <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} signOut={signOut} />
+              <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} signOut={signOut} isMaster={isMasterAdmin} />
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2">
