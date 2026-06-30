@@ -22,7 +22,7 @@ const NAV = [
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
   { to: "/admin/anuncios", label: "Anúncios", icon: Megaphone },
   { to: "/admin/atendimentos", label: "Atendimentos", icon: MessageSquare },
-  { to: "/admin/administradores", label: "Administradores", icon: Users },
+  { to: "/admin/contas", label: "Contas", icon: Users },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 
