@@ -62,8 +62,8 @@ export function ProductCard({ p }: { p: ProductLite }) {
         <div className="mt-3 space-y-0.5">
           {tierLabel && <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
           <div className="text-xl font-bold text-foreground">{formatBRL(displayPrice)}</div>
-          {p.pix_price && !tierLabel && (
-            <div className="text-xs text-primary font-medium">ou {formatBRL(p.pix_price)} no PIX</div>
+          {displayPix != null && (
+            <div className="text-xs text-primary font-medium">ou {formatBRL(displayPix)} no PIX</div>
           )}
           <div className="text-xs text-muted-foreground">
             em até {installments}x de {formatBRL(parcela)}
