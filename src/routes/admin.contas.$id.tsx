@@ -1,14 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth";
+import { useAuth, type AccountType } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, UserCircle, ShieldCheck, ShieldOff, KeyRound, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { PROTECTED_ADMIN_EMAIL } from "@/lib/constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/admin/contas/$id")({
   component: ContaDetalhe,
@@ -66,6 +67,32 @@ function ContaDetalhe() {
     },
     onSuccess: () => {
       toast.success("Privilégio removido");
+      qc.invalidateQueries({ queryKey: ["account", id] });
+      qc.invalidateQueries({ queryKey: ["admin-accounts"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const [pendingType, setPendingType] = useState<AccountType | "">("");
+  const currentType: AccountType = ((data?.profile as any)?.account_type ?? "cliente") as AccountType;
+
+  const changeType = useMutation({
+    mutationFn: async (newType: AccountType) => {
+      // 'admin' type is bookkeeping: also manage user_roles
+      const { error } = await (supabase as any).from("profiles").update({ account_type: newType }).eq("id", id);
+      if (error) throw error;
+      if (newType === "admin" && !data?.isAdmin) {
+        const { error: e2 } = await supabase.from("user_roles").insert({ user_id: id, role: "admin" } as any);
+        if (e2) throw e2;
+      }
+      if (newType !== "admin" && data?.isAdmin) {
+        const { error: e3 } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", "admin");
+        if (e3) throw e3;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Tipo de conta atualizado");
+      setPendingType("");
       qc.invalidateQueries({ queryKey: ["account", id] });
       qc.invalidateQueries({ queryKey: ["admin-accounts"] });
     },
@@ -132,12 +159,38 @@ function ContaDetalhe() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Permissões</CardTitle>
-          <CardDescription>Defina o tipo de conta deste usuário.</CardDescription>
+          <CardTitle className="text-base">Tipo de conta</CardTitle>
+          <CardDescription>Atual: <span className="font-medium capitalize">{currentType}</span></CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-end gap-2">
+          <div className="flex-1 min-w-[200px]">
+            <Select value={pendingType || currentType} onValueChange={(v) => setPendingType(v as AccountType)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cliente">Cliente</SelectItem>
+                <SelectItem value="revendedor">Revendedor</SelectItem>
+                <SelectItem value="produtor">Produtor</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            onClick={() => pendingType && changeType.mutate(pendingType)}
+            disabled={!pendingType || pendingType === currentType || changeType.isPending}
+          >
+            Salvar tipo
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Privilégio de Administrador</CardTitle>
+          <CardDescription>Controle direto do papel "admin" (sincronizado ao tipo).</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {!data.isAdmin && (
-            <Button onClick={() => promote.mutate()} disabled={promote.isPending}>
+            <Button variant="outline" onClick={() => promote.mutate()} disabled={promote.isPending}>
               <ShieldCheck className="h-4 w-4 mr-2" /> Definir como Administrador
             </Button>
           )}

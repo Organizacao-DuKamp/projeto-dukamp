@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
+import { useAuth, priceForAccount } from "@/lib/auth";
 import { toast } from "sonner";
 
 export type ProductLite = {
@@ -11,6 +12,9 @@ export type ProductLite = {
   slug: string;
   code: string;
   price: number;
+  consumer_price?: number | null;
+  reseller_price?: number | null;
+  producer_price?: number | null;
   pix_price: number | null;
   images: string[];
   brand: string | null;
@@ -26,12 +30,15 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export function ProductCard({ p }: { p: ProductLite }) {
   const { add } = useCart();
   const { data: settings } = useSiteSettings();
+  const { accountType } = useAuth();
   const image = p.images?.[0] || "/placeholder.svg";
   const installments = 6;
-  const parcela = p.price / installments;
+  const displayPrice = priceForAccount(p, accountType);
+  const parcela = displayPrice / installments;
+  const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor" : null;
   const wa = whatsappLink(
     settings?.phone,
-    `Olá, tenho interesse no produto: ${p.name} (cód. ${p.code}) - ${formatBRL(p.price)}`,
+    `Olá, tenho interesse no produto: ${p.name} (cód. ${p.code}) - ${formatBRL(displayPrice)}`,
   );
 
   return (
@@ -49,8 +56,9 @@ export function ProductCard({ p }: { p: ProductLite }) {
           {p.name}
         </Link>
         <div className="mt-3 space-y-0.5">
-          <div className="text-xl font-bold text-foreground">{formatBRL(p.price)}</div>
-          {p.pix_price && (
+          {tierLabel && <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
+          <div className="text-xl font-bold text-foreground">{formatBRL(displayPrice)}</div>
+          {p.pix_price && !tierLabel && (
             <div className="text-xs text-primary font-medium">ou {formatBRL(p.pix_price)} no PIX</div>
           )}
           <div className="text-xs text-muted-foreground">
@@ -63,7 +71,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
             className="w-full"
             disabled={p.stock <= 0}
             onClick={() => {
-              add({ id: p.id, name: p.name, price: p.price, image });
+              add({ id: p.id, name: p.name, price: displayPrice, image });
               toast.success("Adicionado ao carrinho");
             }}
           >

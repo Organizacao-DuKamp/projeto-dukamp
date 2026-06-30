@@ -25,10 +25,11 @@ function ProductsAdmin() {
       columns={[
         { key: "name", label: "Nome" },
         { key: "code", label: "Código" },
-        { key: "price", label: "Preço", format: (v) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) },
+        { key: "consumer_price", label: "Cliente", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
+        { key: "reseller_price", label: "Revendedor", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
+        { key: "producer_price", label: "Produtor", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
         { key: "stock", label: "Estoque" },
         { key: "active", label: "Ativo", format: (v) => v ? "Sim" : "Não" },
-        { key: "featured", label: "Destaque", format: (v) => v ? "Sim" : "Não" },
       ]}
       fields={[
         { name: "name", label: "Nome", required: true },
@@ -37,7 +38,10 @@ function ProductsAdmin() {
         { name: "brand", label: "Marca" },
         { name: "category_id", label: "Categoria", type: "select", options: (cats.data ?? []).map((c) => ({ value: c.id, label: c.name })) },
         { name: "catalog_id", label: "Catálogo", type: "select", options: (catalogs.data ?? []).map((c) => ({ value: c.id, label: c.name })) },
-        { name: "price", label: "Preço", type: "number", step: "0.01", defaultValue: 0 },
+        { name: "consumer_price", label: "Preço — Cliente", type: "number", step: "0.01", required: true, defaultValue: 0 },
+        { name: "reseller_price", label: "Preço — Revendedor", type: "number", step: "0.01" },
+        { name: "producer_price", label: "Preço — Produtor", type: "number", step: "0.01" },
+        { name: "price", label: "Preço base (legado)", type: "number", step: "0.01", defaultValue: 0 },
         { name: "pix_price", label: "Preço PIX", type: "number", step: "0.01" },
         { name: "installments", label: "Parcelas", type: "number", defaultValue: 1 },
         { name: "stock", label: "Estoque", type: "number", defaultValue: 0 },

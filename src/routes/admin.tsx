@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, Package, Tag, FolderTree, Image as ImageIcon,
-  Megaphone, Users, Settings, LogOut, ExternalLink, MessageSquare, Menu,
+  Megaphone, Users, Settings, LogOut, ExternalLink, MessageSquare, Menu, ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -22,6 +22,7 @@ const NAV = [
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
   { to: "/admin/anuncios", label: "Anúncios", icon: Megaphone },
   { to: "/admin/atendimentos", label: "Atendimentos", icon: MessageSquare },
+  { to: "/admin/solicitacoes", label: "Solicitações", icon: ClipboardList },
   { to: "/admin/contas", label: "Contas", icon: Users },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];

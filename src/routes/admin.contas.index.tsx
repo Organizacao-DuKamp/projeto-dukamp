@@ -33,7 +33,7 @@ function ContasPage() {
     queryKey: ["admin-accounts"],
     queryFn: async () => {
       const [profilesR, rolesR] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email, avatar_url, created_at"),
+        supabase.from("profiles").select("id, full_name, email, avatar_url, created_at, account_type" as any),
         supabase.from("user_roles").select("user_id, role"),
       ]);
       if (profilesR.error) throw profilesR.error;
@@ -110,11 +110,9 @@ function ContasPage() {
                 <TableCell className="font-medium">{u.full_name || <span className="text-muted-foreground italic">sem nome</span>}</TableCell>
                 <TableCell className="text-sm">{u.email}</TableCell>
                 <TableCell>
-                  {u.isAdmin ? (
-                    <Badge>Administrador</Badge>
-                  ) : (
-                    <Badge variant="secondary">Usuário</Badge>
-                  )}
+                  <Badge variant={u.account_type === "admin" ? "default" : u.account_type === "cliente" ? "secondary" : "outline"} className="capitalize">
+                    {u.account_type ?? "cliente"}
+                  </Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
                   {u.created_at ? new Date(u.created_at).toLocaleDateString("pt-BR") : "—"}
