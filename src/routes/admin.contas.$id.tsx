@@ -73,6 +73,32 @@ function ContaDetalhe() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const [pendingType, setPendingType] = useState<AccountType | "">("");
+  const currentType: AccountType = ((data?.profile as any)?.account_type ?? "cliente") as AccountType;
+
+  const changeType = useMutation({
+    mutationFn: async (newType: AccountType) => {
+      // 'admin' type is bookkeeping: also manage user_roles
+      const { error } = await (supabase as any).from("profiles").update({ account_type: newType }).eq("id", id);
+      if (error) throw error;
+      if (newType === "admin" && !data?.isAdmin) {
+        const { error: e2 } = await supabase.from("user_roles").insert({ user_id: id, role: "admin" } as any);
+        if (e2) throw e2;
+      }
+      if (newType !== "admin" && data?.isAdmin) {
+        const { error: e3 } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", "admin");
+        if (e3) throw e3;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Tipo de conta atualizado");
+      setPendingType("");
+      qc.invalidateQueries({ queryKey: ["account", id] });
+      qc.invalidateQueries({ queryKey: ["admin-accounts"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   if (authLoading) return null;
   if (!isMasterAdmin) {
     return (
