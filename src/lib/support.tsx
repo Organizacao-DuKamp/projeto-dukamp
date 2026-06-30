@@ -70,8 +70,8 @@ export function SupportProvider({ children }: { children: ReactNode }) {
     let cancel = false;
     (async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from("support_tickets" as never)
+      const { data } = await (supabase as any)
+        .from("support_tickets")
         .select("*")
         .eq("user_id", user.id)
         .neq("status", "closed")
@@ -79,7 +79,7 @@ export function SupportProvider({ children }: { children: ReactNode }) {
         .limit(1)
         .maybeSingle();
       if (cancel) return;
-      setTicket((data as SupportTicket) ?? null);
+      setTicket((data as SupportTicket | null) ?? null);
       setLoading(false);
     })();
     return () => {
@@ -95,8 +95,8 @@ export function SupportProvider({ children }: { children: ReactNode }) {
     }
     let cancel = false;
     (async () => {
-      const { data } = await supabase
-        .from("support_messages" as never)
+      const { data } = await (supabase as any)
+        .from("support_messages")
         .select("*")
         .eq("ticket_id", ticket.id)
         .order("created_at", { ascending: true });
@@ -135,8 +135,8 @@ export function SupportProvider({ children }: { children: ReactNode }) {
     if (!open || !ticket || !user) return;
     const unreadIds = messages.filter((m) => m.sender_role === "admin" && !m.read_by_user).map((m) => m.id);
     if (unreadIds.length === 0) return;
-    supabase
-      .from("support_messages" as never)
+    (supabase as any)
+      .from("support_messages")
       .update({ read_by_user: true })
       .in("id", unreadIds)
       .then(() => {});
@@ -146,8 +146,8 @@ export function SupportProvider({ children }: { children: ReactNode }) {
 
   const startTicket = useCallback(async () => {
     if (!user || ticket) return;
-    const { data, error } = await supabase
-      .from("support_tickets" as never)
+    const { data, error } = await (supabase as any)
+      .from("support_tickets")
       .insert({ user_id: user.id, status: "open" })
       .select()
       .single();
@@ -160,7 +160,7 @@ export function SupportProvider({ children }: { children: ReactNode }) {
   const sendMessage = useCallback(
     async (text: string) => {
       if (!user || !ticket || ticket.status === "closed" || !text.trim()) return;
-      await supabase.from("support_messages" as never).insert({
+      await (supabase as any).from("support_messages").insert({
         ticket_id: ticket.id,
         sender_id: user.id,
         sender_role: "user",
@@ -172,8 +172,8 @@ export function SupportProvider({ children }: { children: ReactNode }) {
 
   const closeTicket = useCallback(async () => {
     if (!ticket || !user) return;
-    await supabase
-      .from("support_tickets" as never)
+    await (supabase as any)
+      .from("support_tickets")
       .update({ status: "closed", closed_by: user.id, closed_at: new Date().toISOString() })
       .eq("id", ticket.id);
     setTicket((t) => (t ? { ...t, status: "closed" } : t));
