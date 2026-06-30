@@ -91,7 +91,7 @@ function AdminLayout() {
   return (
     <div className="min-h-screen flex bg-muted/30">
       <aside className="hidden lg:flex w-60 bg-sidebar border-r flex-col shrink-0">
-        <SidebarContent pathname={pathname} signOut={signOut} />
+        <SidebarContent pathname={pathname} signOut={signOut} isMaster={isMasterAdmin} />
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
