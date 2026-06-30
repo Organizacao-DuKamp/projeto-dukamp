@@ -159,12 +159,38 @@ function ContaDetalhe() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Permissões</CardTitle>
-          <CardDescription>Defina o tipo de conta deste usuário.</CardDescription>
+          <CardTitle className="text-base">Tipo de conta</CardTitle>
+          <CardDescription>Atual: <span className="font-medium capitalize">{currentType}</span></CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-end gap-2">
+          <div className="flex-1 min-w-[200px]">
+            <Select value={pendingType || currentType} onValueChange={(v) => setPendingType(v as AccountType)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cliente">Cliente</SelectItem>
+                <SelectItem value="revendedor">Revendedor</SelectItem>
+                <SelectItem value="produtor">Produtor</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            onClick={() => pendingType && changeType.mutate(pendingType)}
+            disabled={!pendingType || pendingType === currentType || changeType.isPending}
+          >
+            Salvar tipo
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Privilégio de Administrador</CardTitle>
+          <CardDescription>Controle direto do papel "admin" (sincronizado ao tipo).</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {!data.isAdmin && (
-            <Button onClick={() => promote.mutate()} disabled={promote.isPending}>
+            <Button variant="outline" onClick={() => promote.mutate()} disabled={promote.isPending}>
               <ShieldCheck className="h-4 w-4 mr-2" /> Definir como Administrador
             </Button>
           )}
