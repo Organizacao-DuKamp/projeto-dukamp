@@ -38,7 +38,7 @@ function Page() {
           <div className="mt-4">
             {tierLabel && <div className="text-[11px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
             <div className="text-3xl font-bold">{formatBRL(displayPrice)}</div>
-            {p.pix_price && !tierLabel && <div className="text-sm text-primary mt-1">ou {formatBRL(p.pix_price)} no PIX</div>}
+            {displayPix != null && <div className="text-sm text-primary mt-1">ou {formatBRL(displayPix)} no PIX</div>}
             {p.installments > 1 && <div className="text-sm text-muted-foreground">em até {p.installments}x sem juros</div>}
           </div>
           <Button
