@@ -57,6 +57,9 @@ function ContasPage() {
     );
   }, [data, q]);
 
+  if (loading) return null;
+  if (!isMasterAdmin) return <AccessDenied />;
+
   return (
     <div className="space-y-4">
       <div>
