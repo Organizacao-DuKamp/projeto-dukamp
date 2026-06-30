@@ -84,7 +84,7 @@ function Page() {
           <Button
             className="mt-6 w-full md:w-auto"
             disabled={p.stock <= 0}
-            onClick={() => { add({ id: p.id, name: p.name, price: displayPrice, image }); toast.success("Adicionado ao carrinho"); }}
+            onClick={() => { add({ id: p.id, name: p.name, price: displayPrice, image: images[0] }); toast.success("Adicionado ao carrinho"); }}
           >
             <ShoppingCart className="h-4 w-4 mr-2" /> {p.stock > 0 ? "Adicionar ao carrinho" : "Indisponível"}
           </Button>
