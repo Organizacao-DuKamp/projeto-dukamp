@@ -40,21 +40,28 @@ type Props = {
   orderBy?: { column: string; ascending?: boolean };
 };
 
+const PAGE_SIZE = 25;
+
 export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const [page, setPage] = useState(1);
 
   const list = useQuery({
-    queryKey: ["admin", table],
+    queryKey: ["admin", table, page],
     queryFn: async () => {
-      let q = supabase.from(table as any).select("*");
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      let q = supabase.from(table as any).select("*", { count: "exact" });
       if (orderBy) q = q.order(orderBy.column, { ascending: orderBy.ascending ?? true });
-      const { data, error } = await q;
+      const { data, error, count } = await q.range(from, to);
       if (error) throw error;
-      return data ?? [];
+      return { rows: data ?? [], count: count ?? 0 };
     },
   });
+  const total = list.data?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const save = useMutation({
     mutationFn: async (values: any) => {
@@ -113,7 +120,7 @@ export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {list.data?.map((row: any) => (
+            {list.data?.rows.map((row: any) => (
               <TableRow key={row.id}>
                 {columns.map((c) => (
                   <TableCell key={c.key}>{c.format ? c.format(row[c.key], row) : String(row[c.key] ?? "")}</TableCell>
@@ -130,12 +137,21 @@ export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) 
                 </TableCell>
               </TableRow>
             ))}
-            {list.data?.length === 0 && (
+            {list.data && list.data.rows.length === 0 && (
               <TableRow><TableCell colSpan={columns.length + 1} className="text-center text-muted-foreground py-8">Nenhum registro</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Página {page} de {totalPages} · {total} registros</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Anterior</Button>
+            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Próxima</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
