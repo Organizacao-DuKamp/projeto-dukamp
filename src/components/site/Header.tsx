@@ -44,7 +44,7 @@ const socials = [
 const WHATSAPP_URL = "https://wa.me/551732753106?text=" + encodeURIComponent("Olá, gostaria de mais informações.");
 
 export function Header() {
-  const { count, items, total, remove } = useCart();
+  const { count, items, total, remove, setQty } = useCart();
   const { user, isAdmin, accountType, signOut } = useAuth();
   const { ticket, openChat } = useSupport();
   const { data: settings } = useSiteSettings();
