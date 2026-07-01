@@ -40,21 +40,28 @@ type Props = {
   orderBy?: { column: string; ascending?: boolean };
 };
 
+const PAGE_SIZE = 25;
+
 export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
+  const [page, setPage] = useState(1);
 
   const list = useQuery({
-    queryKey: ["admin", table],
+    queryKey: ["admin", table, page],
     queryFn: async () => {
-      let q = supabase.from(table as any).select("*");
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      let q = supabase.from(table as any).select("*", { count: "exact" });
       if (orderBy) q = q.order(orderBy.column, { ascending: orderBy.ascending ?? true });
-      const { data, error } = await q;
+      const { data, error, count } = await q.range(from, to);
       if (error) throw error;
-      return data ?? [];
+      return { rows: data ?? [], count: count ?? 0 };
     },
   });
+  const total = list.data?.count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const save = useMutation({
     mutationFn: async (values: any) => {
