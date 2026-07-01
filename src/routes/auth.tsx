@@ -184,7 +184,7 @@ function RegisterForm() {
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="cliente">Consumidor</SelectItem>
-            <SelectItem value="revendedor">Revendedor</SelectItem>
+            
             <SelectItem value="produtor">Produtor Rural</SelectItem>
           </SelectContent>
         </Select>
