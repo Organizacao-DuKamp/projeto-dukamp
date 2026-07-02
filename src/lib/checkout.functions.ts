@@ -20,6 +20,18 @@ function normalizeCorreiosUser(value?: string) {
   return digits.length === 11 || digits.length === 14 ? digits : raw;
 }
 
+function summarizeCorreiosAuthIssue(attempts: Array<{ name: string; status: number; detail: string }>, usuario: string) {
+  const allUnauthorized = attempts.length > 0 && attempts.every((attempt) => attempt.status === 401);
+  if (!allUnauthorized) return "";
+
+  const userHint =
+    onlyDigits(usuario).length === 14
+      ? " O usuário configurado parece ser CNPJ; use o login/idCorreios do Meu Correios, não CNPJ."
+      : "";
+
+  return `${userHint} O retorno 401 em todos os endpoints significa que os Correios recusaram o Basic Auth antes de validar contrato/cartão. O problema está em CORREIOS_USUARIO ou CORREIOS_SENHA: o usuário deve ser exatamente o login/idCorreios exibido em Credenciais no CWS, e a senha deve ser o código de acesso às APIs gerado em Gestão de acesso a APIs. Se ambos estiverem corretos, esse contrato/login ainda não está habilitado/autorizado para a API REST nova dos Correios e precisa ser liberado pelo gerente/suporte tecnológico dos Correios.`;
+}
+
 async function readCorreiosError(res: Response) {
   const text = await res.text();
   try {
@@ -107,12 +119,9 @@ async function correiosToken() {
   const details = attempts
     .map((attempt) => `${attempt.name}=${attempt.status} (${attempt.detail?.slice(0, 200) || "sem detalhe"})`)
     .join(". ");
-  const likelyUserIssue =
-    onlyDigits(usuario).length === 14
-      ? " O usuário configurado parece ser um CNPJ (14 dígitos). Na API dos Correios, o Basic Auth normalmente exige o idCorreios/login do Meu Correios vinculado ao contrato, e a senha deve ser o código de acesso às APIs do CWS."
-      : "";
+  const authIssue = summarizeCorreiosAuthIssue(attempts, usuario);
 
-  throw new Error(`Correios auth falhou: ${attempts.at(-1)?.status || 401}. ${details}.${likelyUserIssue}`);
+  throw new Error(`Correios auth falhou: ${attempts.at(-1)?.status || 401}. ${details}.${authIssue}`);
 }
 
 export const calculateShipping = createServerFn({ method: "POST" })
