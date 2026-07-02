@@ -45,13 +45,6 @@ function validateCorreiosCredentials(usuario: string, senha: string, cartao: str
     console.error("[Correios] credenciais ausentes", { usuario: !!usuario, senha: !!senha, cartao: !!cartao });
     throw new Error("Credenciais Correios ausentes (usuário/senha/cartão)");
   }
-
-  if (senha.length !== 40) {
-    console.error("[Correios] senha inválida para CWS", { senhaLen: senha.length });
-    throw new Error(
-      `CORREIOS_SENHA inválida: o valor atual tem ${senha.length} caracteres. Para a API REST dos Correios, não use a senha de login do Meu Correios; use o código de acesso às APIs do CWS, que normalmente tem 40 caracteres.`,
-    );
-  }
 }
 
 function toCorreiosDimension(value: unknown, min: number) {
@@ -208,22 +201,29 @@ async function correiosToken() {
   const cartao = onlyDigits(cleanSecret(process.env.CORREIOS_CARTAO_POSTAGEM));
   const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
 
+  const senhaFingerprint = senha
+    ? `${senha.slice(0, 2)}***${senha.slice(-2)} (len=${senha.length})`
+    : "vazia";
+  const senhaHasWhitespace = /\s/.test(process.env.CORREIOS_SENHA || "");
+  const senhaHasQuotes = /["']/.test(process.env.CORREIOS_SENHA || "");
+  const usuarioPreview = usuario ? `${usuario.slice(0, 2)}***${usuario.slice(-2)}` : "vazio";
+
   console.log("[Correios] auth start", {
-    hasUsuario: !!usuario,
+    usuarioPreview,
     usuarioLen: usuario.length,
     usuarioDigits: onlyDigits(usuario).length,
     usuarioNormalizedEqualsRaw: usuario === rawUsuario,
-    hasSenha: !!senha,
-    senhaLen: senha.length,
-    hasCartao: !!cartao,
+    senhaFingerprint,
+    senhaHasWhitespace,
+    senhaHasQuotes,
     cartaoLen: cartao.length,
-    hasContrato: !!contrato,
     contratoLen: contrato.length,
   });
 
   validateCorreiosCredentials(usuario, senha, cartao);
 
   const basic = Buffer.from(`${usuario}:${senha}`).toString("base64");
+  console.log("[Correios] basic auth header", { basicLen: basic.length, basicPreview: `${basic.slice(0, 6)}...${basic.slice(-4)}` });
   const headers = { Authorization: `Basic ${basic}`, "Content-Type": "application/json", Accept: "application/json" };
   const attempts: Array<{ name: string; status: number; detail: string }> = [];
 
