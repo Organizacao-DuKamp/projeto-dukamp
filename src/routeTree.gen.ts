@@ -15,6 +15,7 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CatalogosRouteImport } from './routes/catalogos'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -24,6 +25,7 @@ import { Route as ProdutosIndexRouteImport } from './routes/produtos.index'
 import { Route as CatalogosIndexRouteImport } from './routes/catalogos.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
+import { Route as PedidoIdRouteImport } from './routes/pedido.$id'
 import { Route as PaginasSlugRouteImport } from './routes/paginas.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
 import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
@@ -37,6 +39,7 @@ import { Route as AdminAtualizarValoresRouteImport } from './routes/admin.atuali
 import { Route as AdminAtendimentosRouteImport } from './routes/admin.atendimentos'
 import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.index'
+import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
@@ -68,6 +71,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const ContatoRoute = ContatoRouteImport.update({
   id: '/contato',
   path: '/contato',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogosRoute = CatalogosRouteImport.update({
@@ -114,6 +122,11 @@ const ProdutosSlugRoute = ProdutosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ProdutosRoute,
+} as any)
+const PedidoIdRoute = PedidoIdRouteImport.update({
+  id: '/pedido/$id',
+  path: '/pedido/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PaginasSlugRoute = PaginasSlugRouteImport.update({
   id: '/paginas/$slug',
@@ -180,6 +193,12 @@ const AdminContasIndexRoute = AdminContasIndexRouteImport.update({
   path: '/contas/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicMercadopagoWebhookRoute =
+  ApiPublicMercadopagoWebhookRouteImport.update({
+    id: '/api/public/mercadopago-webhook',
+    path: '/api/public/mercadopago-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   id: '/api/public/init-admin',
   path: '/api/public/init-admin',
@@ -197,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
   '/catalogos': typeof CatalogosRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -215,18 +235,21 @@ export interface FileRoutesByFullPath {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
+  '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/catalogos/': typeof CatalogosIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -244,12 +267,14 @@ export interface FileRoutesByTo {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
+  '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin': typeof AdminIndexRoute
   '/catalogos': typeof CatalogosIndexRoute
   '/produtos': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas': typeof AdminContasIndexRoute
 }
 export interface FileRoutesById {
@@ -259,6 +284,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
   '/catalogos': typeof CatalogosRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -277,12 +303,14 @@ export interface FileRoutesById {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
+  '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/catalogos/': typeof CatalogosIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
 }
 export interface FileRouteTypes {
@@ -293,6 +321,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/carrinho'
     | '/catalogos'
+    | '/checkout'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
@@ -311,18 +340,21 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/paginas/$slug'
+    | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin/'
     | '/catalogos/'
     | '/produtos/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/carrinho'
+    | '/checkout'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
@@ -340,12 +372,14 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/paginas/$slug'
+    | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin'
     | '/catalogos'
     | '/produtos'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/api/public/mercadopago-webhook'
     | '/admin/contas'
   id:
     | '__root__'
@@ -354,6 +388,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/carrinho'
     | '/catalogos'
+    | '/checkout'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
@@ -372,12 +407,14 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/paginas/$slug'
+    | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin/'
     | '/catalogos/'
     | '/produtos/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
   fileRoutesById: FileRoutesById
 }
@@ -387,6 +424,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CarrinhoRoute: typeof CarrinhoRoute
   CatalogosRoute: typeof CatalogosRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
   ContatoRoute: typeof ContatoRoute
   DashboardRoute: typeof DashboardRoute
   MinhaContaRoute: typeof MinhaContaRoute
@@ -394,7 +432,9 @@ export interface RootRouteChildren {
   SobreRoute: typeof SobreRoute
   UnidadesRoute: typeof UnidadesRoute
   PaginasSlugRoute: typeof PaginasSlugRoute
+  PedidoIdRoute: typeof PedidoIdRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
+  ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -439,6 +479,13 @@ declare module '@tanstack/react-router' {
       path: '/contato'
       fullPath: '/contato'
       preLoaderRoute: typeof ContatoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogos': {
@@ -503,6 +550,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/produtos/$slug'
       preLoaderRoute: typeof ProdutosSlugRouteImport
       parentRoute: typeof ProdutosRoute
+    }
+    '/pedido/$id': {
+      id: '/pedido/$id'
+      path: '/pedido/$id'
+      fullPath: '/pedido/$id'
+      preLoaderRoute: typeof PedidoIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/paginas/$slug': {
       id: '/paginas/$slug'
@@ -595,6 +649,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContasIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/mercadopago-webhook': {
+      id: '/api/public/mercadopago-webhook'
+      path: '/api/public/mercadopago-webhook'
+      fullPath: '/api/public/mercadopago-webhook'
+      preLoaderRoute: typeof ApiPublicMercadopagoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/init-admin': {
       id: '/api/public/init-admin'
       path: '/api/public/init-admin'
@@ -680,6 +741,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CarrinhoRoute: CarrinhoRoute,
   CatalogosRoute: CatalogosRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
   ContatoRoute: ContatoRoute,
   DashboardRoute: DashboardRoute,
   MinhaContaRoute: MinhaContaRoute,
@@ -687,7 +749,9 @@ const rootRouteChildren: RootRouteChildren = {
   SobreRoute: SobreRoute,
   UnidadesRoute: UnidadesRoute,
   PaginasSlugRoute: PaginasSlugRoute,
+  PedidoIdRoute: PedidoIdRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
+  ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
