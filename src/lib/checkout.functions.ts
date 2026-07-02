@@ -90,8 +90,16 @@ async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingP
   url.searchParams.set("StrRetorno", "xml");
   url.searchParams.set("nIndicaCalculo", "3");
 
-  const res = await fetch(url.toString(), { method: "GET" });
-  const xml = await res.text();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+  let xml = "";
+  let res: Response;
+  try {
+    res = await fetch(url.toString(), { method: "GET", signal: controller.signal });
+    xml = await res.text();
+  } finally {
+    clearTimeout(timeout);
+  }
   if (!res.ok) throw new Error(`calculador público HTTP ${res.status}`);
 
   const erro = parseCorreiosXmlTag(xml, "Erro");
