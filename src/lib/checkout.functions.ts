@@ -14,6 +14,12 @@ function cleanSecret(value?: string) {
   return (value || "").trim();
 }
 
+function normalizeCorreiosUser(value?: string) {
+  const raw = cleanSecret(value);
+  const digits = onlyDigits(raw);
+  return digits.length === 11 || digits.length === 14 ? digits : raw;
+}
+
 async function readCorreiosError(res: Response) {
   const text = await res.text();
   try {
@@ -26,7 +32,7 @@ async function readCorreiosError(res: Response) {
 
 // ---------- Correios CWS ----------
 async function correiosToken() {
-  const usuario = onlyDigits(cleanSecret(process.env.CORREIOS_USUARIO)) || cleanSecret(process.env.CORREIOS_USUARIO);
+  const usuario = normalizeCorreiosUser(process.env.CORREIOS_USUARIO);
   const senha = cleanSecret(process.env.CORREIOS_SENHA);
   const cartao = onlyDigits(cleanSecret(process.env.CORREIOS_CARTAO_POSTAGEM));
   if (!usuario || !senha || !cartao) throw new Error("Credenciais Correios ausentes");
