@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Upload } from "lucide-react";
+import { getDimensionsFromName } from "@/lib/product-dimensions";
 
 export const Route = createFileRoute("/admin/atualizar-valores")({
   component: Page,
@@ -138,6 +139,7 @@ function Page() {
             if (error) throw error;
             result.updated++;
           } else {
+            const dims = getDimensionsFromName(r.name);
             const { error } = await supabase.from("products").insert({
               code: r.code,
               name: r.name,
@@ -147,6 +149,7 @@ function Page() {
               price: r.preco1,
               stock: stockInt,
               active: shouldBeActive,
+              ...dims,
             });
             if (error) throw error;
             result.created++;
