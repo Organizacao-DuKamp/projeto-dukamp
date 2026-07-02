@@ -45,13 +45,6 @@ function validateCorreiosCredentials(usuario: string, senha: string, cartao: str
     console.error("[Correios] credenciais ausentes", { usuario: !!usuario, senha: !!senha, cartao: !!cartao });
     throw new Error("Credenciais Correios ausentes (usuário/senha/cartão)");
   }
-
-  if (senha.length !== 40) {
-    console.error("[Correios] senha inválida para CWS", { senhaLen: senha.length });
-    throw new Error(
-      `CORREIOS_SENHA inválida: o valor atual tem ${senha.length} caracteres. Para a API REST dos Correios, não use a senha de login do Meu Correios; use o código de acesso às APIs do CWS, que normalmente tem 40 caracteres.`,
-    );
-  }
 }
 
 function toCorreiosDimension(value: unknown, min: number) {
