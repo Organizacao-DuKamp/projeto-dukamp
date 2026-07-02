@@ -142,7 +142,36 @@ export function ResourceCrud({ title, table, columns, fields, orderBy, searchFie
             <Button type="button" variant="ghost" onClick={() => { setSearchInput(""); setSearch(""); setPage(1); }}>
               Limpar
             </Button>
+      )}
+
+      {filters && filters.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {filters.map((f) => (
+            <div key={f.column} className="flex items-center gap-2">
+              <Label className="text-sm">{f.label}:</Label>
+              <select
+                className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                value={filterValues[f.column] ?? ""}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setPage(1);
+                  setFilterValues((p) => ({ ...p, [f.column]: v }));
+                }}
+              >
+                <option value="">Todos</option>
+                {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+          ))}
+          {Object.values(filterValues).some(Boolean) && (
+            <Button type="button" variant="ghost" size="sm" onClick={() => { setFilterValues({}); setPage(1); }}>
+              Limpar filtros
+            </Button>
           )}
+        </div>
+      )}
+
+
         </form>
       )}
 
