@@ -257,9 +257,7 @@ export const createPixOrder = createServerFn({ method: "POST" })
     const cpf = onlyDigits(data.cpf_cnpj);
     const idType = cpf.length === 14 ? "CNPJ" : "CPF";
 
-    const notifBase =
-      process.env.PUBLIC_APP_URL ||
-      "https://project--ymujutvxlbwhnsfdlwpz.lovable.app";
+    const notifBase = process.env.PUBLIC_APP_URL || "https://dukamp.lovable.app";
     const notification_url = `${notifBase.replace(/\/$/, "")}/api/public/mercadopago-webhook`;
 
     const expires = new Date(Date.now() + 30 * 60 * 1000);
