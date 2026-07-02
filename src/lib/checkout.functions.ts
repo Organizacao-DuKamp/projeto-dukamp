@@ -344,7 +344,9 @@ export const calculateShipping = createServerFn({ method: "POST" })
         console.error("[Correios] calculador público falhou", {
           reason: legacyError instanceof Error ? legacyError.message.slice(0, 500) : String(legacyError),
         });
-        throw new Error("Não foi possível calcular o frete pelos Correios agora. Verifique o CEP ou tente novamente em alguns minutos.");
+        const restMsg = error instanceof Error ? error.message : String(error);
+        const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
+        throw new Error(`Falha ao calcular frete. REST: ${restMsg} | Legado (CalcPrecoPrazo): ${legacyMsg}`);
       }
     }
   });
