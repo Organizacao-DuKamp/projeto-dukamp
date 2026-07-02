@@ -24,6 +24,13 @@ function ProductsAdmin() {
       orderBy={{ column: "created_at", ascending: false }}
       searchField="name"
       searchPlaceholder="Pesquisar produto por nome..."
+      filters={[
+        {
+          column: "catalog_id",
+          label: "Catálogo",
+          options: (catalogs.data ?? []).map((c) => ({ value: c.id, label: c.name })),
+        },
+      ]}
       columns={[
         { key: "name", label: "Nome" },
         { key: "code", label: "Código" },
