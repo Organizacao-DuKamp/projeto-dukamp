@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Upload } from "lucide-react";
+import { getDimensionsFromName } from "@/lib/product-dimensions";
 
 export const Route = createFileRoute("/admin/atualizar-valores")({
   component: Page,
