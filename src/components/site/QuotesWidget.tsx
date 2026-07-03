@@ -68,7 +68,8 @@ export function QuotesWidget() {
                 <div className="min-w-0">
                   <div className="font-medium text-foreground">{item.name}</div>
                   <div className="text-[10px] text-muted-foreground">
-                    {item.unit} · {formatUpdated(item.updatedAt)}
+                    {item.unit}
+                    {item.region ? ` · ${item.region}` : ""} · {formatUpdated(item.updatedAt)}
                   </div>
                 </div>
                 <div
