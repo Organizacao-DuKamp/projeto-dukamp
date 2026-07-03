@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { InstitutionalSidebar } from "./InstitutionalSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavItems, type NavItem } from "@/lib/navbar-settings";
+import { useAuth } from "@/lib/auth";
 
 function useCategories() {
   return useQuery({
