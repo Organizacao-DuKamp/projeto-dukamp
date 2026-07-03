@@ -416,6 +416,21 @@ export const createPixOrder = createServerFn({ method: "POST" })
       auth: { persistSession: false },
     });
 
+    // Se o usuário estiver logado, associa o pedido a ele
+    let authUserId: string | null = null;
+    try {
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const req = getRequest();
+      const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
+      const token = authHeader?.replace(/^Bearer\s+/i, "");
+      if (token) {
+        const { data: u } = await supa.auth.getUser(token);
+        if (u.user?.id) authUserId = u.user.id;
+      }
+    } catch {
+      // segue anônimo
+    }
+
     // Buscar produtos autoritativos (preços/nome/stock)
     const ids = data.items.map((i) => i.product_id);
     const { data: prods, error: pe } = await supa
