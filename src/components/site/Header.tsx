@@ -210,9 +210,9 @@ export function Header() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={label}
-                  className="h-8 w-8 grid place-items-center rounded hover:bg-accent text-muted-foreground hover:text-primary"
+                  className="h-8 w-8 grid place-items-center rounded hover:bg-accent"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5" />
                 </a>
               ))}
               <a
@@ -220,9 +220,9 @@ export function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="WhatsApp"
-                className="h-8 w-8 grid place-items-center rounded hover:bg-accent text-muted-foreground hover:text-primary"
+                className="h-8 w-8 grid place-items-center rounded hover:bg-accent"
               >
-                <WhatsAppIcon className="h-4 w-4" />
+                <WhatsappBrand className="h-5 w-5" />
               </a>
             </div>
           </div>
