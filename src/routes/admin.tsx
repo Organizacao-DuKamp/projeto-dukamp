@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, Package, Tag, FolderTree, Image as ImageIcon,
   Megaphone, Users, Settings, LogOut, ExternalLink, MessageSquare, Menu, ClipboardList, FileText, RefreshCw, Navigation,
+  ShoppingBag, ChevronDown, BarChart3, History, ListOrdered,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,10 +15,22 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-const NAV = [
+type NavLeaf = { to: string; label: string; icon: any; exact?: boolean };
+type NavGroup = { label: string; icon: any; basePath: string; children: NavLeaf[] };
+type NavEntry = NavLeaf | NavGroup;
+
+const NAV: NavEntry[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/produtos", label: "Produtos", icon: Package },
   { to: "/admin/atualizar-valores", label: "Atualizar Valores", icon: RefreshCw },
+  {
+    label: "Vendas", icon: ShoppingBag, basePath: "/admin/vendas",
+    children: [
+      { to: "/admin/vendas/pedidos", label: "Lista de Pedidos", icon: ListOrdered },
+      { to: "/admin/vendas/historico", label: "Histórico de Vendas", icon: History },
+      { to: "/admin/vendas/painel", label: "Painel", icon: BarChart3 },
+    ],
+  },
   { to: "/admin/catalogos", label: "Catálogos", icon: FolderTree },
   { to: "/admin/categorias", label: "Categorias", icon: Tag },
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
