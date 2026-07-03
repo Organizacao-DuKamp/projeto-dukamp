@@ -540,8 +540,17 @@ export const createPixOrder = createServerFn({ method: "POST" })
       }),
     });
     if (!mpRes.ok) {
-      const t = await mpRes.text();
-      throw new Error(`Mercado Pago falhou: ${mpRes.status} ${t}`);
+      const raw = await mpRes.text();
+      console.error("[MercadoPago] pagamento recusado", mpRes.status, raw);
+      let mpMsg = "";
+      try {
+        const j = JSON.parse(raw) as { message?: string; cause?: Array<{ code?: number; description?: string }> };
+        mpMsg = j.cause?.[0]?.description || j.message || "";
+      } catch {
+        // ignore
+      }
+      const friendly = translateMpError(mpMsg);
+      throw new Error(friendly);
     }
     const mp = (await mpRes.json()) as {
       id: number | string;
