@@ -32,11 +32,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-4 text-sm">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            {logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-8 w-auto max-w-[140px] object-contain" />
-            ) : (
-              <div className="h-8 w-8 rounded-lg bg-primary grid place-items-center text-primary-foreground font-bold">D</div>
-            )}
+            <img src={fixedLogo.url} alt={siteName} className="h-8 w-auto max-w-[140px] object-contain" />
             <div className="font-bold">{siteName}</div>
           </div>
           <p className="text-muted-foreground">{tagline}</p>
