@@ -196,47 +196,40 @@ function CheckoutPage() {
               <Field label="Cidade *"><Input value={form.cidade} onChange={(e) => set("cidade", e.target.value)} /></Field>
               <Field label="UF *"><Input maxLength={2} value={form.estado} onChange={(e) => set("estado", e.target.value.toUpperCase())} /></Field>
             </div>
-            <Button onClick={handleCalcFrete} disabled={loadingFrete} variant="outline">
-              {loadingFrete ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
-              Calcular frete
-            </Button>
-            {shipping && (
-              <div className="text-sm bg-muted rounded p-3">
-                <strong>{shipping.servico}</strong> — {formatBRL(shipping.valor)} • entrega em {shipping.prazoDias} dias úteis
-              </div>
-            )}
+            <p className="text-xs text-muted-foreground">
+              O frete será combinado separadamente após a confirmação do pedido.
+            </p>
           </section>
 
           {/* Pagamento */}
-          {shipping && (
-            <section className="border rounded-lg p-4 bg-card space-y-3">
-              <h2 className="font-semibold">3. Forma de pagamento</h2>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setMethod("pix")}
-                  className={`border rounded-lg p-3 text-left flex items-center gap-3 ${method === "pix" ? "border-primary ring-2 ring-primary/30" : ""}`}
-                >
-                  <QrCode className="h-6 w-6 text-primary" />
-                  <div>
-                    <div className="font-medium">Pix</div>
-                    <div className="text-xs text-muted-foreground">Aprovação imediata</div>
-                  </div>
-                </button>
-                <div className="border rounded-lg p-3 flex items-center gap-3 opacity-60 cursor-not-allowed">
-                  <CreditCard className="h-6 w-6" />
-                  <div>
-                    <div className="font-medium">Cartão de crédito</div>
-                    <div className="text-xs text-muted-foreground">Em breve — indisponível no momento</div>
-                  </div>
+          <section className="border rounded-lg p-4 bg-card space-y-3">
+            <h2 className="font-semibold">3. Forma de pagamento</h2>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setMethod("pix")}
+                className={`border rounded-lg p-3 text-left flex items-center gap-3 ${method === "pix" ? "border-primary ring-2 ring-primary/30" : ""}`}
+              >
+                <QrCode className="h-6 w-6 text-primary" />
+                <div>
+                  <div className="font-medium">Pix</div>
+                  <div className="text-xs text-muted-foreground">Aprovação imediata</div>
+                </div>
+              </button>
+              <div className="border rounded-lg p-3 flex items-center gap-3 opacity-60 cursor-not-allowed">
+                <CreditCard className="h-6 w-6" />
+                <div>
+                  <div className="font-medium">Cartão de crédito</div>
+                  <div className="text-xs text-muted-foreground">Em breve — indisponível no momento</div>
                 </div>
               </div>
-              <Button onClick={handleBuy} disabled={loadingPay || method !== "pix"} className="w-full">
-                {loadingPay ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
-                Comprar — {formatBRL(total)}
-              </Button>
-            </section>
-          )}
+            </div>
+            <Button onClick={handleBuy} disabled={loadingPay || method !== "pix"} className="w-full">
+              {loadingPay ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              Comprar — {formatBRL(total)}
+            </Button>
+          </section>
+
         </div>
 
         <aside>
