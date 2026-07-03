@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { InstitutionalSidebar } from "./InstitutionalSidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavItems, type NavItem } from "@/lib/navbar-settings";
+import { useAuth } from "@/lib/auth";
 
 function useCategories() {
   return useQuery({
@@ -85,8 +86,12 @@ export function MainNav() {
   const [open, setOpen] = useState(false);
   const [mobileProdOpen, setMobileProdOpen] = useState(false);
   const { data: navItems } = useNavItems();
+  const { user } = useAuth();
   const cats = useCategories();
-  const items = (navItems ?? []).filter((n) => n.visible);
+  const baseItems = (navItems ?? []).filter((n) => n.visible);
+  const items: NavItem[] = user
+    ? [...baseItems, { key: "minhas-compras" as any, label: "Minhas Compras", to: "/minhas-compras", visible: true }]
+    : baseItems;
 
   const mobCls = "block py-2.5 px-2 text-sm border-b hover:text-primary";
 

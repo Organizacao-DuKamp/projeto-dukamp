@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnidadesRouteImport } from './routes/unidades'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as MinhasComprasRouteImport } from './routes/minhas-compras'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContatoRouteImport } from './routes/contato'
@@ -42,6 +43,9 @@ import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.index'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
+import { Route as AdminVendasPedidosRouteImport } from './routes/admin.vendas.pedidos'
+import { Route as AdminVendasPainelRouteImport } from './routes/admin.vendas.painel'
+import { Route as AdminVendasHistoricoRouteImport } from './routes/admin.vendas.historico'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
 const UnidadesRoute = UnidadesRouteImport.update({
@@ -57,6 +61,11 @@ const SobreRoute = SobreRouteImport.update({
 const ProdutosRoute = ProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhasComprasRoute = MinhasComprasRouteImport.update({
+  id: '/minhas-compras',
+  path: '/minhas-compras',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MinhaContaRoute = MinhaContaRouteImport.update({
@@ -210,6 +219,21 @@ const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   path: '/api/public/init-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminVendasPedidosRoute = AdminVendasPedidosRouteImport.update({
+  id: '/vendas/pedidos',
+  path: '/vendas/pedidos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminVendasPainelRoute = AdminVendasPainelRouteImport.update({
+  id: '/vendas/painel',
+  path: '/vendas/painel',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminVendasHistoricoRoute = AdminVendasHistoricoRouteImport.update({
+  id: '/vendas/historico',
+  path: '/vendas/historico',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContasIdRoute = AdminContasIdRouteImport.update({
   id: '/contas/$id',
   path: '/contas/$id',
@@ -226,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/unidades': typeof UnidadesRoute
@@ -248,6 +273,9 @@ export interface FileRoutesByFullPath {
   '/catalogos/': typeof CatalogosIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
+  '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
+  '/admin/vendas/painel': typeof AdminVendasPainelRoute
+  '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -260,6 +288,7 @@ export interface FileRoutesByTo {
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/sobre': typeof SobreRoute
   '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
@@ -281,6 +310,9 @@ export interface FileRoutesByTo {
   '/catalogos': typeof CatalogosIndexRoute
   '/produtos': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
+  '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
+  '/admin/vendas/painel': typeof AdminVendasPainelRoute
+  '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas': typeof AdminContasIndexRoute
@@ -296,6 +328,7 @@ export interface FileRoutesById {
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/unidades': typeof UnidadesRoute
@@ -318,6 +351,9 @@ export interface FileRoutesById {
   '/catalogos/': typeof CatalogosIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
+  '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
+  '/admin/vendas/painel': typeof AdminVendasPainelRoute
+  '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -334,6 +370,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
+    | '/minhas-compras'
     | '/produtos'
     | '/sobre'
     | '/unidades'
@@ -356,6 +393,9 @@ export interface FileRouteTypes {
     | '/catalogos/'
     | '/produtos/'
     | '/admin/contas/$id'
+    | '/admin/vendas/historico'
+    | '/admin/vendas/painel'
+    | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
@@ -368,6 +408,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
+    | '/minhas-compras'
     | '/sobre'
     | '/unidades'
     | '/admin/anuncios'
@@ -389,6 +430,9 @@ export interface FileRouteTypes {
     | '/catalogos'
     | '/produtos'
     | '/admin/contas/$id'
+    | '/admin/vendas/historico'
+    | '/admin/vendas/painel'
+    | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas'
@@ -403,6 +447,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
+    | '/minhas-compras'
     | '/produtos'
     | '/sobre'
     | '/unidades'
@@ -425,6 +470,9 @@ export interface FileRouteTypes {
     | '/catalogos/'
     | '/produtos/'
     | '/admin/contas/$id'
+    | '/admin/vendas/historico'
+    | '/admin/vendas/painel'
+    | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
@@ -440,6 +488,7 @@ export interface RootRouteChildren {
   ContatoRoute: typeof ContatoRoute
   DashboardRoute: typeof DashboardRoute
   MinhaContaRoute: typeof MinhaContaRoute
+  MinhasComprasRoute: typeof MinhasComprasRoute
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
   UnidadesRoute: typeof UnidadesRoute
@@ -470,6 +519,13 @@ declare module '@tanstack/react-router' {
       path: '/produtos'
       fullPath: '/produtos'
       preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minhas-compras': {
+      id: '/minhas-compras'
+      path: '/minhas-compras'
+      fullPath: '/minhas-compras'
+      preLoaderRoute: typeof MinhasComprasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/minha-conta': {
@@ -682,6 +738,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInitAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/vendas/pedidos': {
+      id: '/admin/vendas/pedidos'
+      path: '/vendas/pedidos'
+      fullPath: '/admin/vendas/pedidos'
+      preLoaderRoute: typeof AdminVendasPedidosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/vendas/painel': {
+      id: '/admin/vendas/painel'
+      path: '/vendas/painel'
+      fullPath: '/admin/vendas/painel'
+      preLoaderRoute: typeof AdminVendasPainelRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/vendas/historico': {
+      id: '/admin/vendas/historico'
+      path: '/vendas/historico'
+      fullPath: '/admin/vendas/historico'
+      preLoaderRoute: typeof AdminVendasHistoricoRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/contas/$id': {
       id: '/admin/contas/$id'
       path: '/contas/$id'
@@ -706,6 +783,9 @@ interface AdminRouteChildren {
   AdminSolicitacoesRoute: typeof AdminSolicitacoesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminContasIdRoute: typeof AdminContasIdRoute
+  AdminVendasHistoricoRoute: typeof AdminVendasHistoricoRoute
+  AdminVendasPainelRoute: typeof AdminVendasPainelRoute
+  AdminVendasPedidosRoute: typeof AdminVendasPedidosRoute
   AdminContasIndexRoute: typeof AdminContasIndexRoute
 }
 
@@ -723,6 +803,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSolicitacoesRoute: AdminSolicitacoesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminContasIdRoute: AdminContasIdRoute,
+  AdminVendasHistoricoRoute: AdminVendasHistoricoRoute,
+  AdminVendasPainelRoute: AdminVendasPainelRoute,
+  AdminVendasPedidosRoute: AdminVendasPedidosRoute,
   AdminContasIndexRoute: AdminContasIndexRoute,
 }
 
@@ -766,6 +849,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContatoRoute: ContatoRoute,
   DashboardRoute: DashboardRoute,
   MinhaContaRoute: MinhaContaRoute,
+  MinhasComprasRoute: MinhasComprasRoute,
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,
   UnidadesRoute: UnidadesRoute,

@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, Package, Tag, FolderTree, Image as ImageIcon,
   Megaphone, Users, Settings, LogOut, ExternalLink, MessageSquare, Menu, ClipboardList, FileText, RefreshCw, Navigation,
+  ShoppingBag, ChevronDown, BarChart3, History, ListOrdered,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,10 +15,22 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-const NAV = [
+type NavLeaf = { to: string; label: string; icon: any; exact?: boolean };
+type NavGroup = { label: string; icon: any; basePath: string; children: NavLeaf[] };
+type NavEntry = NavLeaf | NavGroup;
+
+const NAV: NavEntry[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/produtos", label: "Produtos", icon: Package },
   { to: "/admin/atualizar-valores", label: "Atualizar Valores", icon: RefreshCw },
+  {
+    label: "Vendas", icon: ShoppingBag, basePath: "/admin/vendas",
+    children: [
+      { to: "/admin/vendas/pedidos", label: "Lista de Pedidos", icon: ListOrdered },
+      { to: "/admin/vendas/historico", label: "Histórico de Vendas", icon: History },
+      { to: "/admin/vendas/painel", label: "Painel", icon: BarChart3 },
+    ],
+  },
   { to: "/admin/catalogos", label: "Catálogos", icon: FolderTree },
   { to: "/admin/categorias", label: "Categorias", icon: Tag },
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
@@ -30,8 +43,12 @@ const NAV = [
   { to: "/admin/footer", label: "Footer", icon: FileText },
 ];
 
+function isGroup(n: NavEntry): n is NavGroup {
+  return (n as NavGroup).children !== undefined;
+}
+
 function SidebarContent({ pathname, onNavigate, signOut, isMaster }: { pathname: string; onNavigate?: () => void; signOut: () => void; isMaster: boolean }) {
-  const items = NAV.filter((n) => n.to !== "/admin/contas" || isMaster);
+  const items = NAV.filter((n) => isGroup(n) || n.to !== "/admin/contas" || isMaster);
   return (
     <>
       <Link to="/admin" onClick={onNavigate} className="flex items-center gap-2 px-4 h-16 border-b">
@@ -43,6 +60,33 @@ function SidebarContent({ pathname, onNavigate, signOut, isMaster }: { pathname:
       </Link>
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {items.map((n) => {
+          if (isGroup(n)) {
+            const groupActive = pathname.startsWith(n.basePath);
+            return (
+              <details key={n.label} open={groupActive} className="group">
+                <summary className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer list-none ${groupActive ? "bg-accent" : "hover:bg-accent"}`}>
+                  <n.icon className="h-4 w-4" />
+                  <span className="flex-1">{n.label}</span>
+                  <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="mt-1 ml-3 pl-3 border-l space-y-1">
+                  {n.children.map((c) => {
+                    const active = pathname === c.to || pathname.startsWith(c.to + "/");
+                    return (
+                      <Link
+                        key={c.to}
+                        to={c.to}
+                        onClick={onNavigate}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${active ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+                      >
+                        <c.icon className="h-3.5 w-3.5" /> {c.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </details>
+            );
+          }
           const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
           return (
             <Link
