@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand, WhatsappBrand } from "./BrandIcons";
-import fixedLogo from "@/assets/dukamp-logo-fixed.png.asset.json";
+import fixedLogo from "@/assets/dukamp-logo-transparent.png.asset.json";
 
 const socials = [
   { href: "https://www.facebook.com/dukampsaudeanimal/", label: "Facebook", Icon: FacebookBrand },
