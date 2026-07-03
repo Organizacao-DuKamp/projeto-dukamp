@@ -67,7 +67,9 @@ function SidebarContent({ pathname, onNavigate, signOut, isMaster }: { pathname:
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {items.map((n) => {
           if (isGroup(n)) {
-            const groupActive = pathname.startsWith(n.basePath);
+            const groupActive =
+              pathname.startsWith(n.basePath) ||
+              n.children.some((c) => pathname === c.to || pathname.startsWith(c.to + "/"));
             return (
               <details key={n.label} open={groupActive} className="group">
                 <summary className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer list-none ${groupActive ? "bg-accent" : "hover:bg-accent"}`}>
