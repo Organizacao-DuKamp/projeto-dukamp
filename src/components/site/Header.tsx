@@ -54,9 +54,9 @@ export function Header() {
         <div className="flex h-16 items-center gap-4">
           <Link to="/" className="flex items-center shrink-0" aria-label="Início">
             <img
-              src={settings?.logo_url || dukampLogo.url}
+              src={fixedLogo.url}
               alt="Dukamp Saúde Animal"
-              className="h-12 sm:h-14 w-auto object-contain select-none"
+              className="h-11 sm:h-12 w-auto object-contain select-none"
               draggable={false}
             />
           </Link>
