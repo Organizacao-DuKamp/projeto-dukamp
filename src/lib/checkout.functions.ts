@@ -344,10 +344,7 @@ export const calculateShipping = createServerFn({ method: "POST" })
     if (cepDest.length !== 8) throw new Error("CEP de destino inválido");
 
     // Buscar dimensões dos produtos
-    const { createClient } = await import("@supabase/supabase-js");
-    const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-      auth: { persistSession: false },
-    });
+    const supa = await getServerSupabase();
     const ids = data.items.map((i) => i.product_id);
     const { data: prods, error } = await supa
       .from("products")
@@ -432,10 +429,7 @@ const orderSchema = z.object({
 export const createPixOrder = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => orderSchema.parse(data))
   .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-      auth: { persistSession: false },
-    });
+    const supa = await getServerSupabase();
 
     // Se o usuário estiver logado, associa o pedido a ele
     let authUserId: string | null = null;
@@ -600,10 +594,7 @@ export const createPixOrder = createServerFn({ method: "POST" })
 export const getOrderPublic = createServerFn({ method: "GET" })
   .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-      auth: { persistSession: false },
-    });
+    const supa = await getServerSupabase();
     const { data: order, error } = await supa
       .from("orders")
       .select(
