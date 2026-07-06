@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { MapCepPicker } from "@/components/site/MapCepPicker";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -106,11 +108,13 @@ function CheckoutPage() {
     }
   }
 
-  async function handleCalcFrete() {
-    const cep = form.cep.replace(/\D/g, "");
-    if (cep.length !== 8) return toast.error("Informe um CEP válido (8 números)");
+  async function handleCalcFreteFor(rawCep: string) {
+    const cep = rawCep.replace(/\D/g, "");
+    if (cep.length !== 8) {
+      toast.error("Informe um CEP válido (8 números)");
+      return;
+    }
     if (items.length === 0) return;
-    if (!form.rua) await lookupCep(cep);
     setLoadingFrete(true);
     try {
       const r = await calcFrete({
@@ -127,6 +131,12 @@ function CheckoutPage() {
     } finally {
       setLoadingFrete(false);
     }
+  }
+
+  async function handleCalcFrete() {
+    const cep = form.cep.replace(/\D/g, "");
+    if (!form.rua && cep.length === 8) await lookupCep(cep);
+    await handleCalcFreteFor(cep);
   }
 
   function validateDelivery(): string | null {
@@ -242,37 +252,60 @@ function CheckoutPage() {
               <div className="space-y-6">
                 {/* CEP + Calcular frete (destaque) */}
                 <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-4">
-                  <Label className="text-sm font-semibold flex items-center gap-2 mb-2">
+                  <Label className="text-sm font-semibold flex items-center gap-2 mb-3">
                     <Truck className="h-4 w-4 text-primary" />
                     Calcule seu frete pelos Correios
                   </Label>
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
-                    <div className="relative min-w-0">
-                      <Input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="Digite seu CEP"
-                        value={form.cep}
-                        onChange={(e) => set("cep", e.target.value)}
-                        onBlur={(e) => lookupCep(e.target.value)}
-                        className="h-11 text-base font-medium"
+                  <Tabs defaultValue="cep" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-3">
+                      <TabsTrigger value="cep">Digitar CEP</TabsTrigger>
+                      <TabsTrigger value="map">Escolher no mapa</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="cep" className="mt-0">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+                        <div className="relative min-w-0">
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="Digite seu CEP"
+                            value={form.cep}
+                            onChange={(e) => set("cep", e.target.value)}
+                            onBlur={(e) => lookupCep(e.target.value)}
+                            className="h-11 text-base font-medium"
+                          />
+                          {loadingCep && (
+                            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={handleCalcFrete}
+                          disabled={loadingFrete || form.cep.replace(/\D/g, "").length !== 8}
+                          size="lg"
+                          className="h-11 px-4 sm:px-6 gap-2"
+                        >
+                          {loadingFrete ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                          <span className="hidden sm:inline">Calcular frete</span>
+                          <span className="sm:hidden">Calcular</span>
+                        </Button>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="map" className="mt-0">
+                      <MapCepPicker
+                        onResult={async (r) => {
+                          setForm((f) => ({
+                            ...f,
+                            cep: r.cep,
+                            rua: r.rua || f.rua,
+                            bairro: r.bairro || f.bairro,
+                            cidade: r.cidade || f.cidade,
+                            estado: r.estado || f.estado,
+                          }));
+                          await handleCalcFreteFor(r.cep);
+                        }}
                       />
-                      {loadingCep && (
-                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />
-                      )}
-                    </div>
-                    <Button
-                      type="button"
-                      onClick={handleCalcFrete}
-                      disabled={loadingFrete || form.cep.replace(/\D/g, "").length !== 8}
-                      size="lg"
-                      className="h-11 px-4 sm:px-6 gap-2"
-                    >
-                      {loadingFrete ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
-                      <span className="hidden sm:inline">Calcular frete</span>
-                      <span className="sm:hidden">Calcular</span>
-                    </Button>
-                  </div>
+                    </TabsContent>
+                  </Tabs>
                   {frete && (
                     <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md bg-background p-3 border">
                       <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
@@ -284,6 +317,7 @@ function CheckoutPage() {
                     </div>
                   )}
                 </div>
+
 
                 {/* Endereço */}
                 <div className="grid grid-cols-1 sm:grid-cols-6 gap-3">
