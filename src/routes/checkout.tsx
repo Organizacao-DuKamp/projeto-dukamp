@@ -2,13 +2,13 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixOrder } from "@/lib/checkout.functions";
+import { createPixOrder, calculateShipping } from "@/lib/checkout.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, CreditCard, QrCode, Lock } from "lucide-react";
+import { Loader2, CreditCard, QrCode, Lock, Truck } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   ssr: false,
@@ -50,9 +50,12 @@ function CheckoutPage() {
   const [form, setForm] = useState<Form>(emptyForm);
   const [loadingCep, setLoadingCep] = useState(false);
   const [loadingPay, setLoadingPay] = useState(false);
+  const [loadingFrete, setLoadingFrete] = useState(false);
   const [method, setMethod] = useState<"pix" | "card">("pix");
+  const [frete, setFrete] = useState<{ valor: number; prazoDias: number; servico: string; dataMaxima?: string } | null>(null);
 
   const createOrder = useServerFn(createPixOrder);
+  const calcFrete = useServerFn(calculateShipping);
 
 
   function set<K extends keyof Form>(k: K, v: string) {
@@ -82,12 +85,35 @@ function CheckoutPage() {
     }
   }
 
+  async function handleCalcFrete() {
+    const cep = form.cep.replace(/\D/g, "");
+    if (cep.length !== 8) return toast.error("Informe um CEP válido");
+    if (items.length === 0) return;
+    setLoadingFrete(true);
+    try {
+      const r = await calcFrete({
+        data: {
+          cepDestino: cep,
+          items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
+        },
+      });
+      setFrete(r);
+      toast.success(`Frete ${r.servico}: ${formatBRL(r.valor)} em até ${r.prazoDias} dia(s)`);
+    } catch (e) {
+      setFrete(null);
+      toast.error(e instanceof Error ? e.message : "Erro ao calcular frete");
+    } finally {
+      setLoadingFrete(false);
+    }
+  }
+
   function validateDelivery(): string | null {
     for (const k of ["customer_name", "email", "phone", "cpf_cnpj", "cep", "rua", "numero", "bairro", "cidade", "estado"] as const) {
       if (!form[k]?.trim()) return `Preencha ${k.replace("_", " ")}`;
     }
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return "E-mail inválido";
     if (form.estado.length !== 2) return "UF deve ter 2 letras";
+    if (!frete) return "Calcule o frete antes de finalizar";
     return null;
   }
 
@@ -102,9 +128,9 @@ function CheckoutPage() {
         data: {
           ...form,
           items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
-          shipping_cost: 0,
-          shipping_service: "A combinar",
-          shipping_deadline_days: 0,
+          shipping_cost: frete?.valor ?? 0,
+          shipping_service: frete?.servico ?? "A combinar",
+          shipping_deadline_days: frete?.prazoDias ?? 0,
         },
       });
       clear();
@@ -117,7 +143,7 @@ function CheckoutPage() {
   }
 
 
-  const total = subtotal;
+  const total = subtotal + (frete?.valor ?? 0);
 
   if (items.length === 0) {
     return (
@@ -176,9 +202,19 @@ function CheckoutPage() {
               <Field label="Cidade *"><Input value={form.cidade} onChange={(e) => set("cidade", e.target.value)} /></Field>
               <Field label="UF *"><Input maxLength={2} value={form.estado} onChange={(e) => set("estado", e.target.value.toUpperCase())} /></Field>
             </div>
-            <p className="text-xs text-muted-foreground">
-              O frete será combinado separadamente após a confirmação do pedido.
-            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-2 border-t">
+              <Button type="button" variant="outline" onClick={handleCalcFrete} disabled={loadingFrete || form.cep.replace(/\D/g, "").length !== 8}>
+                {loadingFrete ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                Calcular frete
+              </Button>
+              {frete ? (
+                <div className="text-sm">
+                  <span className="font-medium">{frete.servico}:</span> {formatBRL(frete.valor)} — entrega em até {frete.prazoDias} dia(s){frete.dataMaxima ? ` (até ${frete.dataMaxima})` : ""}
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">Informe o CEP e clique em Calcular frete.</span>
+              )}
+            </div>
           </section>
 
           {/* Pagamento */}
@@ -216,7 +252,8 @@ function CheckoutPage() {
           <div className="border rounded-lg p-4 bg-card sticky top-4 space-y-2 text-sm">
             <h2 className="font-semibold">Resumo</h2>
             <Row label="Subtotal" value={formatBRL(subtotal)} />
-            <Row label="Frete" value="A combinar" />
+            <Row label="Frete" value={frete ? `${frete.servico} — ${formatBRL(frete.valor)}` : "A calcular"} />
+            {frete && <Row label="Prazo" value={`até ${frete.prazoDias} dia(s)`} /> }
             <div className="border-t pt-2 flex justify-between font-bold text-base">
               <span>Total</span><span>{formatBRL(total)}</span>
             </div>
