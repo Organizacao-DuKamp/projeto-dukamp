@@ -13,8 +13,8 @@ function LayoutInner({ children }: { children: ReactNode }) {
       <div
         className={`layout-grid grid gap-6 ${
           expanded
-            ? "lg:grid-cols-[minmax(0,20rem)_1fr]"
-            : "lg:grid-cols-[1fr_20rem]"
+            ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]"
+            : "lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]"
         }`}
       >
         <main data-quotes-expanded={expanded} className="min-w-0 order-1">
