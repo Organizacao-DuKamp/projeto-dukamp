@@ -361,7 +361,8 @@ export const calculateShipping = createServerFn({ method: "POST" })
     if (!pacotes.length) throw new Error("Produto inválido no carrinho");
 
     try {
-      const { token } = await correiosToken();
+      const envToken = cleanSecret(process.env.CORREIOS_TOKEN);
+      const token = envToken || (await correiosToken()).token;
       const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
       return await calculateCorreiosRestShipping(token, cepDest, contrato, pacotes);
     } catch (error) {
