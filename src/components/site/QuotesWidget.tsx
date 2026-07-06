@@ -121,6 +121,7 @@ export function QuotesWidget() {
             >
               <Maximize2 className="h-3.5 w-3.5" />
             </button>
+            <button
               onClick={() => refetch()}
               disabled={isFetching}
               aria-label="Atualizar cotações"
