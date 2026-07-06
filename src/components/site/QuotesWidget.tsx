@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
-import { Activity, ArrowDownRight, ArrowUpRight, BarChart3, Beef, DollarSign, Minus, RefreshCw, Ship } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowUpRight, Maximize2, Beef, DollarSign, Minus, RefreshCw, Ship } from "lucide-react";
 import { getMarketQuotes, type QuoteItem } from "@/lib/quotes.functions";
+import { useQuotesPanel } from "@/lib/quotes-panel";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   usd: DollarSign,
@@ -84,6 +84,7 @@ function ChangeBadge({ item }: { item: QuoteItem }) {
 }
 
 export function QuotesWidget() {
+  const { toggle } = useQuotesPanel();
   const fetchQuotes = useServerFn(getMarketQuotes);
   const { data, isLoading, isError, refetch, isFetching, dataUpdatedAt } = useQuery({
     queryKey: ["market-quotes"],
@@ -112,14 +113,14 @@ export function QuotesWidget() {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Link
-              to="/cotacoes"
-              aria-label="Abrir painel de cotações"
-              title="Painel de cotações por estado"
+            <button
+              onClick={toggle}
+              aria-label="Expandir painel de cotações"
+              title="Expandir painel de cotações"
               className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition"
             >
-              <BarChart3 className="h-3.5 w-3.5" />
-            </Link>
+              <Maximize2 className="h-3.5 w-3.5" />
+            </button>
             <button
               onClick={() => refetch()}
               disabled={isFetching}
