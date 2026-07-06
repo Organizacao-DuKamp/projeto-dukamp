@@ -5,6 +5,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { createPixOrder, calculateShipping } from "@/lib/checkout.functions";
 import { useSiteSettings } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -106,7 +110,6 @@ function CheckoutPage() {
     const cep = form.cep.replace(/\D/g, "");
     if (cep.length !== 8) return toast.error("Informe um CEP válido (8 números)");
     if (items.length === 0) return;
-    // Se ainda não temos endereço preenchido, tenta buscar antes
     if (!form.rua) await lookupCep(cep);
     setLoadingFrete(true);
     try {
@@ -176,18 +179,18 @@ function CheckoutPage() {
   const total = subtotal + (frete?.valor ?? 0);
   const totalItens = items.reduce((n, i) => n + i.quantity, 0);
   const suportePhoneDigits = (settings?.phone ?? "").replace(/\D/g, "");
-  const suportePhoneDisplay = settings?.phone || "(00) 00000-0000";
+  const suportePhoneDisplay = settings?.phone || "";
 
   if (items.length === 0) {
     return (
       <SiteLayout>
-        <div className="mx-auto max-w-xl text-center py-20">
-          <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-full bg-[#0f5132]/10">
-            <ShoppingBag className="h-10 w-10 text-[#0f5132]" />
+        <div className="mx-auto max-w-xl text-center py-16">
+          <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full bg-primary/10">
+            <ShoppingBag className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-black text-zinc-800">Seu carrinho está vazio</h1>
-          <p className="mt-3 text-lg text-zinc-500">Escolha os produtos antes de finalizar a compra.</p>
-          <Button asChild size="lg" className="mt-8 h-14 bg-[#0f5132] px-8 text-lg font-bold uppercase hover:bg-[#0a3a24]">
+          <h1 className="text-2xl font-bold">Seu carrinho está vazio</h1>
+          <p className="mt-2 text-muted-foreground">Escolha os produtos antes de finalizar a compra.</p>
+          <Button asChild size="lg" className="mt-6">
             <Link to="/produtos">Ver produtos</Link>
           </Button>
         </div>
@@ -197,254 +200,242 @@ function CheckoutPage() {
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-6xl font-sans">
-        {/* Título + progresso */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-black text-zinc-900 tracking-tight">Finalizar sua compra</h1>
-          <p className="mt-2 text-lg text-zinc-500 font-medium">
-            Siga os 3 passos abaixo. É simples e seguro.
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Finalizar compra</h1>
+          <p className="mt-1 text-sm sm:text-base text-muted-foreground">
+            Revise seu pedido, calcule o frete e finalize com Pix.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Coluna principal */}
-          <div className="lg:col-span-8 space-y-8">
-            {/* Seção 1 — Revisão */}
-            <SectionCard number={1} icon={<ClipboardList className="h-6 w-6" />} title="O que você está comprando">
-              <div className="p-6 space-y-4">
+          <div className="lg:col-span-8 space-y-6 min-w-0">
+            {/* 1 — Revisão */}
+            <Section number={1} icon={<ClipboardList className="h-4 w-4" />} title="Seu pedido">
+              <div className="space-y-3">
                 {items.map((i) => (
-                  <div key={i.id} className="flex items-center gap-4 sm:gap-6 border-b-2 border-dashed border-zinc-100 pb-4 last:border-b-0 last:pb-0">
-                    <div className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-xl bg-zinc-100 grid place-items-center">
+                  <div key={i.id} className="flex items-center gap-3 sm:gap-4 py-2 border-b last:border-b-0">
+                    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border bg-white grid place-items-center">
                       {i.image ? (
-                        <img src={i.image} alt={i.name} className="h-full w-full object-cover" />
+                        <img src={i.image} alt={i.name} className="h-full w-full object-contain p-1" />
                       ) : (
-                        <ShoppingBag className="h-8 w-8 text-zinc-400" />
+                        <ShoppingBag className="h-6 w-6 text-muted-foreground" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-lg sm:text-xl font-bold text-zinc-800 line-clamp-2">{i.name}</h3>
-                      <p className="text-zinc-500 font-bold text-base sm:text-lg">
-                        {String(i.quantity).padStart(2, "0")} {i.quantity === 1 ? "Unidade" : "Unidades"} · {formatBRL(i.price)} cada
+                      <h3 className="text-sm sm:text-base font-medium line-clamp-2">{i.name}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        {i.quantity} × {formatBRL(i.price)}
                       </p>
-                      <p className="text-[#0f5132] font-black text-xl sm:text-2xl mt-1">{formatBRL(i.price * i.quantity)}</p>
+                    </div>
+                    <div className="text-sm sm:text-base font-semibold whitespace-nowrap">
+                      {formatBRL(i.price * i.quantity)}
                     </div>
                   </div>
                 ))}
               </div>
-            </SectionCard>
+            </Section>
 
-            {/* Seção 2 — Entrega */}
-            <SectionCard number={2} icon={<MapPin className="h-6 w-6" />} title="Onde vamos entregar?">
-              <div className="p-6 space-y-8">
-                {/* CEP grande + calcular */}
-                <div>
-                  <label className="block text-lg sm:text-xl font-extrabold text-zinc-700 mb-3">
-                    Qual o seu CEP?
-                    <span className="ml-2 text-sm font-medium text-zinc-500">(8 números)</span>
-                  </label>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                      <input
+            {/* 2 — Entrega */}
+            <Section number={2} icon={<MapPin className="h-4 w-4" />} title="Entrega">
+              <div className="space-y-6">
+                {/* CEP + Calcular frete (destaque) */}
+                <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-4">
+                  <Label className="text-sm font-semibold flex items-center gap-2 mb-2">
+                    <Truck className="h-4 w-4 text-primary" />
+                    Calcule seu frete pelos Correios
+                  </Label>
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+                    <div className="relative min-w-0">
+                      <Input
                         type="text"
                         inputMode="numeric"
-                        placeholder="Ex: 15000-000"
+                        placeholder="Digite seu CEP"
                         value={form.cep}
                         onChange={(e) => set("cep", e.target.value)}
                         onBlur={(e) => lookupCep(e.target.value)}
-                        className="w-full h-16 sm:h-20 rounded-2xl border-4 border-zinc-200 bg-white px-5 sm:px-6 text-2xl sm:text-3xl font-black text-zinc-800 outline-none transition-colors focus:border-[#0f5132]"
+                        className="h-11 text-base font-medium"
                       />
                       {loadingCep && (
-                        <Loader2 className="absolute right-5 top-1/2 -translate-y-1/2 h-6 w-6 animate-spin text-[#0f5132]" />
+                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-primary" />
                       )}
                     </div>
-                    <button
+                    <Button
                       type="button"
                       onClick={handleCalcFrete}
                       disabled={loadingFrete || form.cep.replace(/\D/g, "").length !== 8}
-                      className="h-16 sm:h-20 rounded-2xl bg-zinc-800 px-8 sm:px-10 font-black text-lg sm:text-xl text-white transition-all hover:bg-black active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
+                      size="lg"
+                      className="h-11 px-4 sm:px-6 gap-2"
                     >
-                      {loadingFrete ? <Loader2 className="h-6 w-6 animate-spin" /> : <Truck className="h-6 w-6" />}
-                      CALCULAR
-                    </button>
+                      {loadingFrete ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                      <span className="hidden sm:inline">Calcular frete</span>
+                      <span className="sm:hidden">Calcular</span>
+                    </Button>
                   </div>
                   {frete && (
-                    <div className="mt-4 rounded-2xl border-2 border-green-100 bg-green-50 p-4 flex flex-wrap items-center gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-[#0f5132] shrink-0" />
-                      <div className="text-base sm:text-lg">
-                        <span className="font-black text-[#0f5132] uppercase">{frete.servico}</span>
-                        <span className="text-zinc-700 font-bold"> — {formatBRL(frete.valor)}</span>
-                        <span className="text-zinc-600 font-semibold"> · entrega em até {frete.prazoDias} dia(s){frete.dataMaxima ? ` (até ${frete.dataMaxima})` : ""}</span>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md bg-background p-3 border">
+                      <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
+                      <div className="text-sm min-w-0">
+                        <span className="font-semibold">{frete.servico}</span>
+                        <span className="text-muted-foreground"> — entrega em até {frete.prazoDias} dia(s){frete.dataMaxima ? ` (${frete.dataMaxima})` : ""}</span>
                       </div>
+                      <div className="ml-auto text-base font-bold text-primary">{formatBRL(frete.valor)}</div>
                     </div>
-                  )}
-                  {!frete && (
-                    <p className="mt-3 text-sm text-zinc-500 font-medium">Digite o CEP e clique em <b>CALCULAR</b> para ver o valor e o prazo do frete pelos Correios.</p>
                   )}
                 </div>
 
                 {/* Endereço */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <BigField className="md:col-span-2" label="Rua, Estrada ou Localidade" placeholder="Ex: Estrada da Fazenda Velha, KM 10">
-                    <input value={form.rua} onChange={(e) => set("rua", e.target.value)} placeholder="Ex: Estrada da Fazenda Velha, KM 10" className="input-agro" />
-                  </BigField>
-                  <BigField label="Número / KM" placeholder="Ex: 500">
-                    <input value={form.numero} onChange={(e) => set("numero", e.target.value)} placeholder="Ex: 500" className="input-agro" />
-                  </BigField>
-
-                  <BigField className="md:col-span-2" label="Complemento / Ponto de referência" placeholder="Ex: Próximo à ponte do rio (opcional)">
-                    <input value={form.complemento} onChange={(e) => set("complemento", e.target.value)} placeholder="Ex: Próximo à ponte do rio (opcional)" className="input-agro" />
-                  </BigField>
-                  <BigField label="Bairro" placeholder="Ex: Zona Rural">
-                    <input value={form.bairro} onChange={(e) => set("bairro", e.target.value)} placeholder="Ex: Zona Rural" className="input-agro" />
-                  </BigField>
-
-                  <BigField className="md:col-span-2" label="Cidade" placeholder="Ex: São José do Rio Preto">
-                    <input value={form.cidade} onChange={(e) => set("cidade", e.target.value)} placeholder="Ex: São José do Rio Preto" className="input-agro" />
-                  </BigField>
-                  <BigField label="UF (Estado)" placeholder="Ex: SP">
-                    <input value={form.estado} maxLength={2} onChange={(e) => set("estado", e.target.value.toUpperCase())} placeholder="Ex: SP" className="input-agro uppercase" />
-                  </BigField>
+                <div className="grid grid-cols-1 sm:grid-cols-6 gap-3">
+                  <Field className="sm:col-span-4" label="Rua / Estrada">
+                    <Input value={form.rua} onChange={(e) => set("rua", e.target.value)} placeholder="Ex: Estrada da Fazenda, KM 10" />
+                  </Field>
+                  <Field className="sm:col-span-2" label="Número / KM">
+                    <Input value={form.numero} onChange={(e) => set("numero", e.target.value)} placeholder="500" />
+                  </Field>
+                  <Field className="sm:col-span-4" label="Complemento (opcional)">
+                    <Input value={form.complemento} onChange={(e) => set("complemento", e.target.value)} placeholder="Ponto de referência" />
+                  </Field>
+                  <Field className="sm:col-span-2" label="Bairro">
+                    <Input value={form.bairro} onChange={(e) => set("bairro", e.target.value)} placeholder="Zona Rural" />
+                  </Field>
+                  <Field className="sm:col-span-4" label="Cidade">
+                    <Input value={form.cidade} onChange={(e) => set("cidade", e.target.value)} placeholder="São José do Rio Preto" />
+                  </Field>
+                  <Field className="sm:col-span-2" label="UF">
+                    <Input value={form.estado} maxLength={2} onChange={(e) => set("estado", e.target.value.toUpperCase())} placeholder="SP" className="uppercase" />
+                  </Field>
                 </div>
 
+                <Separator />
+
                 {/* Dados pessoais */}
-                <div className="pt-4 border-t-2 border-dashed border-zinc-100">
-                  <h3 className="text-lg sm:text-xl font-extrabold text-zinc-700 mb-4">Seus dados para contato</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <BigField label="Nome completo" placeholder="Ex: José Pereira de Souza">
-                      <input value={form.customer_name} onChange={(e) => set("customer_name", e.target.value)} placeholder="Ex: José Pereira de Souza" className="input-agro" />
-                    </BigField>
-                    <BigField label="Telefone / WhatsApp" placeholder="Ex: (17) 99999-9999">
-                      <input value={form.phone} inputMode="tel" onChange={(e) => set("phone", e.target.value)} placeholder="Ex: (17) 99999-9999" className="input-agro" />
-                    </BigField>
-                    <BigField label="E-mail" placeholder="Ex: seunome@email.com">
-                      <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="Ex: seunome@email.com" className="input-agro" />
-                    </BigField>
-                    <BigField label="CPF ou CNPJ" placeholder="Somente números">
-                      <input value={form.cpf_cnpj} inputMode="numeric" onChange={(e) => set("cpf_cnpj", e.target.value)} placeholder="Somente números" className="input-agro" />
-                    </BigField>
+                <div>
+                  <h3 className="text-sm font-semibold mb-3">Dados para contato</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Field label="Nome completo">
+                      <Input value={form.customer_name} onChange={(e) => set("customer_name", e.target.value)} placeholder="Ex: José Pereira" />
+                    </Field>
+                    <Field label="Telefone / WhatsApp">
+                      <Input value={form.phone} inputMode="tel" onChange={(e) => set("phone", e.target.value)} placeholder="(17) 99999-9999" />
+                    </Field>
+                    <Field label="E-mail">
+                      <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="seunome@email.com" />
+                    </Field>
+                    <Field label="CPF ou CNPJ">
+                      <Input value={form.cpf_cnpj} inputMode="numeric" onChange={(e) => set("cpf_cnpj", e.target.value)} placeholder="Somente números" />
+                    </Field>
                   </div>
                 </div>
               </div>
-            </SectionCard>
+            </Section>
 
-            {/* Seção 3 — Pagamento */}
-            <SectionCard number={3} icon={<Wallet className="h-6 w-6" />} title="Escolha como pagar">
-              <div className="p-6 space-y-4">
+            {/* 3 — Pagamento */}
+            <Section number={3} icon={<Wallet className="h-4 w-4" />} title="Pagamento">
+              <div className="space-y-3">
                 <button
                   type="button"
                   onClick={() => setMethod("pix")}
-                  className={`w-full flex items-center justify-between gap-4 rounded-3xl border-4 p-5 sm:p-8 text-left transition-all ${
-                    method === "pix" ? "border-[#0f5132] bg-green-50" : "border-zinc-200 bg-white hover:border-zinc-300"
+                  className={`w-full flex items-center gap-3 rounded-lg border-2 p-4 text-left transition-all ${
+                    method === "pix" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                   }`}
                 >
-                  <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-                    <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[#32bcad] shadow-lg shadow-teal-900/10">
-                      <PixIcon className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-2xl sm:text-3xl font-black text-zinc-800">PIX</p>
-                      <p className="text-sm sm:text-base font-bold uppercase text-green-700">Pague e receba mais rápido</p>
-                    </div>
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-[#32bcad] text-white">
+                    <PixIcon className="h-5 w-5" />
                   </div>
-                  <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border-4 ${method === "pix" ? "border-[#0f5132]" : "border-zinc-300"}`}>
-                    {method === "pix" && <div className="h-4 w-4 rounded-full bg-[#0f5132]" />}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">PIX</p>
+                    <p className="text-xs text-muted-foreground">Aprovação imediata — receba mais rápido</p>
+                  </div>
+                  <div className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${method === "pix" ? "border-primary" : "border-muted-foreground/40"}`}>
+                    {method === "pix" && <div className="h-2 w-2 rounded-full bg-primary" />}
                   </div>
                 </button>
 
-                <div className="w-full flex items-center justify-between gap-4 rounded-3xl border-4 border-zinc-100 bg-zinc-50 p-5 sm:p-8 opacity-60 grayscale cursor-not-allowed">
-                  <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-                    <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-zinc-400">
-                      <CreditCard className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xl sm:text-2xl font-bold text-zinc-500">Cartão de Crédito</p>
-                      <p className="text-sm font-bold uppercase text-zinc-400">Em breve — indisponível no momento</p>
-                    </div>
+                <div className="flex items-center gap-3 rounded-lg border-2 border-dashed p-4 opacity-60 cursor-not-allowed">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
+                    <CreditCard className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">Cartão de crédito</p>
+                    <p className="text-xs text-muted-foreground">Em breve</p>
                   </div>
                 </div>
               </div>
-            </SectionCard>
+            </Section>
           </div>
 
-          {/* Sidebar de resumo */}
-          <aside className="lg:col-span-4">
-            <div className="lg:sticky lg:top-6 space-y-6">
-              <div className="overflow-hidden rounded-3xl border-4 border-[#0f5132] bg-white shadow-2xl shadow-green-900/10">
-                <div className="p-6 sm:p-8">
-                  <h2 className="mb-6 flex items-center gap-3 text-xl sm:text-2xl font-black uppercase text-zinc-800">
-                    <ClipboardList className="h-7 w-7 text-[#0f5132]" />
-                    Total da compra
-                  </h2>
-
-                  <div className="space-y-3 border-b-4 border-zinc-100 pb-6 mb-6">
-                    <SummaryRow label={`Produtos (${totalItens})`} value={formatBRL(subtotal)} />
-                    <SummaryRow label="Frete" value={frete ? formatBRL(frete.valor) : "A calcular"} />
-                    {frete && (
-                      <div className="mt-4 flex items-center justify-between rounded-2xl border-2 border-green-100 bg-green-50 p-3">
-                        <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-[#0f5132]">Entrega em:</span>
-                        <span className="text-base sm:text-lg font-black text-[#0f5132]">
-                          {frete.prazoDias} DIA{frete.prazoDias === 1 ? "" : "S"} ÚTE{frete.prazoDias === 1 ? "L" : "IS"}
-                        </span>
-                      </div>
-                    )}
+          {/* Sidebar */}
+          <aside className="lg:col-span-4 min-w-0">
+            <div className="lg:sticky lg:top-6 space-y-4">
+              <Card className="border-2 border-primary/30 shadow-md overflow-hidden">
+                <CardHeader className="bg-primary/5 pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4 text-primary" />
+                    Resumo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-3">
+                  <Row label={`Produtos (${totalItens})`} value={formatBRL(subtotal)} />
+                  <Row
+                    label="Frete"
+                    value={frete ? formatBRL(frete.valor) : <span className="text-muted-foreground text-sm">A calcular</span>}
+                  />
+                  {frete && (
+                    <div className="text-xs text-muted-foreground">
+                      Entrega em até <b className="text-foreground">{frete.prazoDias} dia{frete.prazoDias === 1 ? "" : "s"} úte{frete.prazoDias === 1 ? "l" : "is"}</b>
+                    </div>
+                  )}
+                  <Separator />
+                  <div className="flex items-end justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">Total</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-primary tracking-tight">{formatBRL(total)}</span>
                   </div>
 
-                  <div className="mb-6 text-center">
-                    <span className="mb-1 block text-xs font-bold uppercase text-zinc-400">Valor final a pagar</span>
-                    <span className="block text-4xl sm:text-5xl font-black tracking-tighter text-[#0f5132]">{formatBRL(total)}</span>
-                  </div>
-
-                  <button
+                  <Button
                     type="button"
                     onClick={handleBuy}
                     disabled={loadingPay || method !== "pix"}
-                    className="w-full rounded-3xl border-b-8 border-[#073621] bg-[#0f5132] py-6 sm:py-7 text-2xl sm:text-3xl font-black uppercase tracking-tighter text-white shadow-2xl shadow-green-900/30 transition-all hover:bg-[#0a3a24] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-3"
+                    size="lg"
+                    className="w-full h-12 text-base font-bold gap-2 mt-2"
                   >
-                    {loadingPay ? <Loader2 className="h-7 w-7 animate-spin" /> : <Lock className="h-6 w-6" />}
+                    {loadingPay ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-4 w-4" />}
                     PAGAR AGORA
-                  </button>
+                  </Button>
 
-                  <div className="mt-6 flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-xs font-black uppercase text-[#0f5132]">
-                      <ShieldCheck className="h-4 w-4" />
-                      Ambiente 100% seguro
-                    </div>
-                    <p className="text-center text-[11px] font-bold text-zinc-400">
-                      Dukamp Saúde Animal · Pagamento processado por Mercado Pago
-                    </p>
+                  <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                    Ambiente seguro · Mercado Pago
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              {/* Card de ajuda */}
-              <div className="rounded-2xl bg-zinc-800 p-6 text-white">
-                <p className="text-lg font-black">Dificuldade para comprar?</p>
-                <p className="mt-1 text-sm font-bold text-zinc-400">Fale com a gente. Nossa equipe te ajuda por telefone ou WhatsApp:</p>
-                <div className="mt-4 space-y-2">
-                  <a
-                    href={`tel:${suportePhoneDigits || ""}`}
-                    className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 p-3 transition-colors hover:bg-white/20"
-                  >
-                    <span className="grid h-9 w-9 place-items-center rounded-full bg-[#0f5132]">
-                      <Phone className="h-4 w-4" />
-                    </span>
-                    <span className="text-base sm:text-lg font-black">{suportePhoneDisplay}</span>
-                  </a>
-                  {suportePhoneDigits && (
-                    <a
-                      href={`https://wa.me/${suportePhoneDigits}`}
-                      target="_blank"
-                      rel="noopener"
-                      className="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 p-3 transition-colors hover:bg-white/20"
-                    >
-                      <span className="grid h-9 w-9 place-items-center rounded-full bg-green-500">
+              {suportePhoneDigits && (
+                <Card>
+                  <CardContent className="pt-5">
+                    <p className="text-sm font-semibold">Precisa de ajuda?</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Nossa equipe atende por telefone ou WhatsApp.</p>
+                    <div className="mt-3 space-y-2">
+                      <a
+                        href={`tel:${suportePhoneDigits}`}
+                        className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-accent transition-colors"
+                      >
+                        <Phone className="h-4 w-4 text-primary" />
+                        {suportePhoneDisplay}
+                      </a>
+                      <a
+                        href={`https://wa.me/${suportePhoneDigits}`}
+                        target="_blank"
+                        rel="noopener"
+                        className="flex items-center gap-2 rounded-md bg-[#25D366] px-3 py-2 text-sm font-semibold text-white hover:bg-[#1ebe57] transition-colors"
+                      >
                         <MessageCircle className="h-4 w-4" />
-                      </span>
-                      <span className="text-base sm:text-lg font-black">Chamar no WhatsApp</span>
-                    </a>
-                  )}
-                </div>
-              </div>
+                        Chamar no WhatsApp
+                      </a>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </aside>
         </div>
@@ -455,7 +446,7 @@ function CheckoutPage() {
 
 /* ---------- pieces ---------- */
 
-function SectionCard({
+function Section({
   number,
   icon,
   title,
@@ -467,50 +458,45 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-3xl border-2 border-zinc-200 bg-white shadow-sm">
-      <div className="flex items-center gap-4 bg-[#0f5132] p-5 sm:p-6">
-        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-xl font-black text-[#0f5132]">
-          {number}
-        </div>
-        <div className="hidden sm:grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/10 text-white">
-          {icon}
-        </div>
-        <h2 className="min-w-0 truncate text-lg sm:text-xl font-black uppercase tracking-tight text-white">
-          {title}
-        </h2>
-      </div>
-      {children}
-    </section>
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-3 text-base sm:text-lg">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
+            {number}
+          </span>
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+            {icon}
+          </span>
+          <span className="min-w-0 truncate">{title}</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   );
 }
 
-function BigField({
+function Field({
   label,
-  placeholder,
   className = "",
   children,
 }: {
   label: string;
-  placeholder?: string;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className={className}>
-      <label className="mb-2 block text-base sm:text-lg font-bold text-zinc-700">
-        {label}
-        {placeholder && <span className="ml-2 text-xs font-medium text-zinc-400 hidden sm:inline">{placeholder}</span>}
-      </label>
+    <div className={`min-w-0 ${className}`}>
+      <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">{label}</Label>
       {children}
     </div>
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between text-lg">
-      <span className="font-bold text-zinc-500">{label}</span>
-      <span className="font-black text-zinc-800">{value}</span>
+    <div className="flex items-center justify-between text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-semibold">{value}</span>
     </div>
   );
 }
