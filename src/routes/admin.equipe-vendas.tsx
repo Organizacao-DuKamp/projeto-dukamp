@@ -270,6 +270,7 @@ function SellerForm({
     phone: initial?.phone ?? "",
     whatsapp: initial?.whatsapp ?? "",
     photo_url: initial?.photo_url ?? "",
+    cutout_url: initial?.cutout_url ?? "",
     banner_url: initial?.banner_url ?? "",
     active: initial?.active ?? true,
     display_order: initial?.display_order ?? 0,
