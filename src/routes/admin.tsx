@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, Package, Tag, FolderTree, Image as ImageIcon,
   Megaphone, Users, Settings, LogOut, ExternalLink, MessageSquare, Menu, ClipboardList, FileText, RefreshCw, Navigation,
-  ShoppingBag, ChevronDown, BarChart3, History, ListOrdered, Boxes,
+  ShoppingBag, ChevronDown, BarChart3, History, ListOrdered, Boxes, UserSquare2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
