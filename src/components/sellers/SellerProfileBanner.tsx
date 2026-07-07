@@ -11,56 +11,51 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
   );
   const phoneDisplay = formatPhoneDisplay(seller.phone ?? seller.whatsapp);
   const photo = seller.photo_url || seller.cutout_url;
+  const bg = seller.banner_url || bannerBg;
 
   return (
-    <section
-      className="relative overflow-hidden rounded-2xl border border-border shadow-md bg-[#f7f2ea]"
-      style={{ aspectRatio: "auto" }}
-    >
-      {/* Fundo sutil de pasto/gado em cinza no lado direito */}
+    <section className="relative overflow-hidden rounded-3xl shadow-xl bg-white border border-border">
+      {/* Fundo sutil de pasto */}
       <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-25"
-        style={{
-          backgroundImage: `url(${seller.banner_url || bannerBg})`,
-          filter: "grayscale(100%) contrast(0.9)",
-        }}
+        className="absolute inset-0 bg-cover bg-center opacity-20"
+        style={{ backgroundImage: `url(${bg})`, filter: "grayscale(100%)" }}
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#f7f2ea] via-[#f7f2ea]/70 to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-white/40"
         aria-hidden
       />
 
-      {/* Curva amarela grande no canto inferior direito */}
+      {/* Curva amarela grande — canto inferior direito */}
       <div
-        className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-[#f6c515] md:h-80 md:w-80"
+        className="pointer-events-none absolute -right-28 -bottom-28 h-72 w-72 rounded-full bg-[#f6c515] md:h-96 md:w-96"
         aria-hidden
       />
-      {/* Curva vermelha menor no canto superior direito */}
+      {/* Curva vermelha — canto superior direito */}
       <div
-        className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#d81f26] md:h-52 md:w-52"
+        className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#d81f26] md:h-64 md:w-64"
         aria-hidden
       />
 
-      <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] md:items-center md:gap-10 md:p-8">
+      <div className="relative grid gap-6 p-6 sm:p-8 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:items-center md:gap-10 md:p-10">
         {/* Foto com arcos vermelho + amarelo à direita */}
-        <div className="relative mx-auto md:mx-0 w-full max-w-[300px]">
+        <div className="relative mx-auto md:mx-0 w-full max-w-[240px] md:max-w-[260px]">
           <div className="relative">
             {/* Arco amarelo (externo) */}
             <div
-              className="absolute -right-6 -top-4 -bottom-4 w-10 rounded-r-[999px] bg-[#f6c515] md:-right-8 md:w-12"
+              className="absolute -right-5 -top-3 -bottom-3 w-8 rounded-r-full bg-[#f6c515] md:-right-6 md:w-10"
               aria-hidden
             />
-            {/* Arco vermelho (interno, sobreposto ao amarelo pela esquerda) */}
+            {/* Arco vermelho (interno) */}
             <div
-              className="absolute -right-2 -top-2 -bottom-2 w-10 rounded-r-[999px] bg-[#d81f26] md:w-12"
+              className="absolute -right-1.5 -top-1.5 -bottom-1.5 w-8 rounded-r-full bg-[#d81f26] md:w-10"
               aria-hidden
             />
             {/* Foto */}
-            <div className="relative overflow-hidden rounded-2xl bg-muted aspect-[4/3] shadow-lg ring-1 ring-black/5">
+            <div className="relative overflow-hidden rounded-2xl bg-muted aspect-square shadow-lg ring-1 ring-black/5">
               {photo ? (
                 <img
-                  src={optimizedImage(photo, { width: 700, quality: 85 })}
+                  src={optimizedImage(photo, { width: 600, quality: 85 })}
                   alt={seller.name}
                   className="h-full w-full object-cover"
                   decoding="async"
@@ -75,12 +70,12 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
         </div>
 
         {/* Info */}
-        <div className="relative text-center md:text-left space-y-2.5 md:pl-4">
+        <div className="relative text-center md:text-left space-y-2.5">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#d81f26] text-white px-3 py-1 text-xs font-bold shadow">
             <Star className="h-3.5 w-3.5 fill-white" /> DESTAQUE
           </span>
 
-          <h1 className="text-2xl sm:text-3xl md:text-[2.15rem] font-black leading-tight text-foreground">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black leading-tight text-foreground">
             {seller.name}
           </h1>
 
@@ -113,7 +108,7 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
                 href={wa}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1fbe5a] text-white font-bold px-5 py-2.5 shadow-md transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1fbe5a] text-white font-bold px-6 py-3 shadow-lg transition-colors"
               >
                 <MessageCircle className="h-5 w-5 fill-white" />
                 Falar no WhatsApp
