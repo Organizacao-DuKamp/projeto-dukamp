@@ -1,10 +1,16 @@
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, Play } from "lucide-react";
 import { toast } from "sonner";
 
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+
+export function isVideoUrl(url: string): boolean {
+  if (!url) return false;
+  const clean = url.split("?")[0].toLowerCase();
+  return /\.(mp4|webm|mov|m4v|ogv)$/.test(clean);
+}
 
 async function uploadOne(file: File, folder?: string): Promise<string> {
   const ext = file.name.split(".").pop() || "bin";
@@ -21,6 +27,7 @@ async function uploadOne(file: File, folder?: string): Promise<string> {
   if (sErr || !data) throw sErr ?? new Error("Falha ao gerar URL");
   return data.signedUrl;
 }
+
 
 export function ImageUpload({
   value,
