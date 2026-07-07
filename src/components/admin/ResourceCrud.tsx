@@ -227,7 +227,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
   const [values, setValues] = useState<any>(() => {
     const v: any = {};
     fields.forEach((f) => {
-      if (f.type === "imageList") {
+      if (f.type === "imageList" || f.type === "mediaList") {
         v[f.name] = Array.isArray(initial?.[f.name]) ? initial[f.name] : (f.defaultValue ?? []);
       } else {
         v[f.name] = initial?.[f.name] ?? f.defaultValue ?? (f.type === "boolean" ? false : f.type === "number" ? 0 : "");
