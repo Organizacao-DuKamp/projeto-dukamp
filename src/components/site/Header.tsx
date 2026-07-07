@@ -21,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand, WhatsappBrand } from "./BrandIcons";
+import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand } from "./BrandIcons";
 import fixedLogo from "@/assets/dukamp-logo.png";
 
 const socials = [
