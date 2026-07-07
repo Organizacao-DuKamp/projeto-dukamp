@@ -210,15 +210,6 @@ export function Header() {
                   <Icon className="h-5 w-5" />
                 </a>
               ))}
-              <a
-                href={wa}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="WhatsApp"
-                className="h-8 w-8 grid place-items-center rounded hover:bg-accent"
-              >
-                <WhatsappBrand className="h-5 w-5" />
-              </a>
             </div>
           </div>
         </div>
