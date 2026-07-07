@@ -46,7 +46,7 @@ export function Header() {
     if (q.trim()) navigate({ to: "/produtos", search: { q: q.trim() } as any });
   }
 
-  const wa = WHATSAPP_URL;
+
 
   return (
     <header className="border-b bg-card sticky top-0 z-40">
