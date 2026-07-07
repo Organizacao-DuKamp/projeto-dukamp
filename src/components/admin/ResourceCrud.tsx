@@ -258,7 +258,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
     <form onSubmit={submit} className="space-y-3">
       <div className="grid sm:grid-cols-2 gap-3">
         {fields.map((f) => (
-          <div key={f.name} className={f.type === "textarea" || f.type === "image" || f.type === "imageList" ? "sm:col-span-2" : ""}>
+          <div key={f.name} className={f.type === "textarea" || f.type === "image" || f.type === "imageList" || f.type === "mediaList" ? "sm:col-span-2" : ""}>
             <Label>{f.label}</Label>
             {f.type === "textarea" ? (
               <Textarea value={values[f.name] ?? ""} onChange={(e) => handleChange(f.name, e.target.value)} rows={4} />
