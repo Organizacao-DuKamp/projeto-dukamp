@@ -1,41 +1,58 @@
-## Situação atual
+# Equipe de Vendas — Plano
 
-Comparando `PROD_WEB.txt` (98 produtos) com a tabela `products` (51 produtos):
+## Estimativa de créditos
+Operação média (nova tabela + migration + 4 componentes + 2 rotas + 1 CRUD admin + ajuste de navbar). Estimo **~6–8 créditos**. Como passa de 5, **aguardo sua confirmação** antes de executar.
 
-- **Todos os 51 produtos já têm `code` preenchido**.
-- **Nenhum dos 9 códigos com preço vazio no banco existe no PROD_WEB.txt** — ou seja, casamento por código não resolve. É preciso casar por nome (fuzzy), como você mencionou.
-- Só faz sentido atualizar esses 9 produtos (os demais já têm `consumer_price` e `producer_price`).
+## O que será construído
 
-## Produtos do banco com preço vazio e possíveis matches no arquivo
+### 1. Banco de dados (migration)
+Nova tabela `public.sellers`:
+- `name`, `role` (cargo), `region` (cidade/UF), `phone`, `whatsapp`, `photo_url`, `banner_url` (opcional), `active` (bool), `display_order` (int), `slug` (único, gerado do nome)
+- RLS: leitura pública apenas de `active = true`; escrita só para admin (`has_role`)
+- GRANTs corretos para `anon` (SELECT) / `authenticated` / `service_role`
+- Trigger `updated_at`
 
-| # | Produto no banco (code) | Match sugerido no PROD_WEB (code) | Consumidor | Produtor | Confiança |
-|---|---|---|---|---|---|
-| 1 | DUKAMP 87/S 30KG (005430) | *sem match* (arquivo só tem 40/60/65/80/S) | — | — | nenhum |
-| 2 | DUKAMP CONCENTRADO CONFINAMENTO CGI-15/380 30KG (020687) | DUKAMP CONCENTRADO CONFINAMENTO GI-15/380 (020567) | 112,16 | 115,32 | alta |
-| 3 | DUKAMP PROTEICO SECA ENGORDA GOLD 30KG (067150) | *sem match direto* (arquivo tem ENGORDA / ADITIVADO / PREMIUM, nenhum "GOLD") | — | — | nenhum |
-| 4 | DUKAMP RACAO BABY ELITE 30KG (004920) | DUKAMP RACAO BABY 30KG (001643) — só "BABY", não "BABY ELITE" | 63,52 | 61,44 | baixa |
-| 5 | DUKAMP RACAO CONFINAMENTO 18 PREMIUM 30KG (072564) | DUKAMP RACAO CONFINAMENTO PREMIUM 30 KGS (074187) | 53,90 | 53,90 | média |
-| 6 | DUKAMP RACAO TOTAL M ENERGETICA 2% 30KG (077118) | DUKAMP RACAO DIETA TOTAL M ENERGETICA 2 % (077119) | 55,90 | 55,90 | alta |
-| 7 | RACAO DUKAVALLUS EGUA PELETIZADA 30KG (050652) | *sem match* (arquivo só tem DUKAVALLUS-14) | — | — | nenhum |
-| 8 | RACAO DUKAVALLUS POTRO PELETIZADA 30KG (007234) | *sem match* | — | — | nenhum |
-| 9 | RACAO PROTEINADA DUKAVALLUS 30KG (052590) | *sem match* | — | — | nenhum |
+### 2. Navbar
+Adicionar o item **"Equipe de Vendas"** apontando para `/equipe-de-vendas` em `src/lib/navbar-settings.ts` (`DEFAULT_NAV_ITEMS`), substituindo o atual "Equipe de Vendas" que hoje aponta pra `/contato`.
 
-## Restrições que vou respeitar
+### 3. Rotas públicas
+- `src/routes/equipe-de-vendas.index.tsx` — grid responsivo de vendedores ativos ordenados por `display_order`. Card mostra foto (frame circular) + nome + cargo + cidade. SEO head próprio.
+- `src/routes/equipe-de-vendas.$slug.tsx` — página de perfil com o **banner estilo Dukamp** (referência da imagem enviada):
+  - Fundo branco com **curvas vermelhas e amarelas** nas laterais (SVG puro, sem imagem)
+  - Foto do vendedor em moldura circular grande à esquerda (com anel vermelho/amarelo)
+  - Badge "DESTAQUE" vermelho, nome grande, cargo em vermelho
+  - Ícones de localização e telefone (telefone com `tel:` clicável)
+  - Botão verde **"Falar no WhatsApp"** abrindo `https://wa.me/<numero>` em nova aba
+  - Se `banner_url` estiver definido, usar como background da faixa mantendo o botão sobreposto
+  - Layout responsivo: mobile empilha foto em cima, desktop lado a lado
+  - SEO: title/description/og com nome do vendedor + og:image = foto
 
-- Não criar nem deletar produtos.
-- Não sobrescrever preços já preenchidos (`consumer_price`/`producer_price` diferente de 0 e NULL).
-- Não alterar `code` (todos já existem).
+### 4. Componentes reutilizáveis
+- `src/components/sellers/SellerCard.tsx` — card do grid
+- `src/components/sellers/SellerProfileBanner.tsx` — banner grande com curvas SVG, foto circular, CTA WhatsApp; aceita `banner_url` opcional
+- `src/components/sellers/SellerForm.tsx` — formulário admin
+- `src/components/sellers/AdminSellerTable.tsx` — tabela admin com toggle ativo, editar/excluir, botões ↑/↓ para reordenar
 
-## O que vou fazer após aprovação
+### 5. Admin
+- Nova rota `src/routes/admin.equipe-vendas.tsx` (dentro do layout admin existente)
+- Item novo na sidebar admin (em `src/routes/admin.tsx`)
+- CRUD completo: criar, editar, excluir, ativar/desativar, reordenar (↑/↓ atualizando `display_order`)
+- Upload de foto e banner via `ImageUpload` existente (bucket `media`), com sugestão de PNG com fundo transparente para melhor encaixe
+- **Remoção automática de fundo:** vou usar CSS (foto em moldura circular com `object-cover`) como fallback confiável universal. Remoção real de fundo exigiria integração com API externa paga (remove.bg) ou modelo em cliente pesado (~5MB); recomendo o admin subir PNG já sem fundo. Se quiser, posso propor a integração como próximo passo separado.
 
-1. **Aplicar automaticamente** os matches de confiança **alta** (linhas 2 e 6): atualizar `consumer_price` e `producer_price` (só onde estão em 0/NULL).
-2. **Aguardar sua confirmação** para os matches ambíguos (linhas 4 e 5) — provavelmente são produtos distintos e não devem ser preenchidos com preços de outro item.
-3. **Deixar como estão** os produtos sem match no arquivo (linhas 1, 3, 7, 8, 9).
+### 6. Formatação
+Helper `formatWhatsappUrl(number)` que limpa o número e monta `https://wa.me/55XXXXXXXXXXX`. Helper `formatPhoneDisplay` para exibir bonito.
 
-## Perguntas para você
+## Detalhes técnicos (para referência)
 
-- **Linha 4** (BABY ELITE ↔ BABY): aplicar mesmo assim? Provavelmente **não**, "ELITE" costuma ser produto premium com preço diferente.
-- **Linha 5** (CONFINAMENTO 18 PREMIUM ↔ CONFINAMENTO PREMIUM): aplicar? O "18" pode indicar teor proteico distinto.
-- **Linhas 1, 3, 7, 8, 9**: quer que eu deixe em 0 mesmo, ou você tem outro arquivo/fonte com esses preços?
+- Queries via TanStack Query com `supabase` client
+- Loader nas rotas públicas SEM `requireSupabaseAuth` (leitura pública via policy anon)
+- Página de perfil usa loader para popular `head()` com og:image do vendedor
+- Curvas do banner: 2 SVGs absolutos (esquerda vermelha, direita amarela) com `pointer-events-none`
+- Cores usando tokens existentes; adicionar tokens `--seller-red` e `--seller-yellow` em `src/styles.css` se necessário para o gradiente do banner
 
-Ao aprovar, entro em modo build, aplico as atualizações confirmadas via SQL `UPDATE` na tabela `products` e reporto quantas linhas foram tocadas.
+## Fora do escopo
+- Remoção automática de fundo por IA (fallback = frame circular)
+- Filtros/busca de vendedores (posso adicionar depois se quiser)
+
+Confirma para eu prosseguir?
