@@ -581,6 +581,54 @@ export type Database = {
         }
         Relationships: []
       }
+      sellers: {
+        Row: {
+          active: boolean
+          banner_url: string | null
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          phone: string | null
+          photo_url: string | null
+          region: string | null
+          role: string | null
+          slug: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          active?: boolean
+          banner_url?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          region?: string | null
+          role?: string | null
+          slug: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          active?: boolean
+          banner_url?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          region?: string | null
+          role?: string | null
+          slug?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
