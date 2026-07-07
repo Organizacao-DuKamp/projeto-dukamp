@@ -24,17 +24,20 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProdutosIndexRouteImport } from './routes/produtos.index'
+import { Route as EquipeDeVendasIndexRouteImport } from './routes/equipe-de-vendas.index'
 import { Route as CatalogosIndexRouteImport } from './routes/catalogos.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
 import { Route as PedidoIdRouteImport } from './routes/pedido.$id'
 import { Route as PaginasSlugRouteImport } from './routes/paginas.$slug'
+import { Route as EquipeDeVendasSlugRouteImport } from './routes/equipe-de-vendas.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
 import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as AdminNavbarRouteImport } from './routes/admin.navbar'
 import { Route as AdminFooterRouteImport } from './routes/admin.footer'
 import { Route as AdminEstoqueRouteImport } from './routes/admin.estoque'
+import { Route as AdminEquipeVendasRouteImport } from './routes/admin.equipe-vendas'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminCatalogosRouteImport } from './routes/admin.catalogos'
@@ -125,6 +128,11 @@ const ProdutosIndexRoute = ProdutosIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProdutosRoute,
 } as any)
+const EquipeDeVendasIndexRoute = EquipeDeVendasIndexRouteImport.update({
+  id: '/equipe-de-vendas/',
+  path: '/equipe-de-vendas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogosIndexRoute = CatalogosIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -148,6 +156,11 @@ const PedidoIdRoute = PedidoIdRouteImport.update({
 const PaginasSlugRoute = PaginasSlugRouteImport.update({
   id: '/paginas/$slug',
   path: '/paginas/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeDeVendasSlugRoute = EquipeDeVendasSlugRouteImport.update({
+  id: '/equipe-de-vendas/$slug',
+  path: '/equipe-de-vendas/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogosSlugRoute = CatalogosSlugRouteImport.update({
@@ -178,6 +191,11 @@ const AdminFooterRoute = AdminFooterRouteImport.update({
 const AdminEstoqueRoute = AdminEstoqueRouteImport.update({
   id: '/estoque',
   path: '/estoque',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEquipeVendasRoute = AdminEquipeVendasRouteImport.update({
+  id: '/equipe-vendas',
+  path: '/equipe-vendas',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
@@ -274,17 +292,20 @@ export interface FileRoutesByFullPath {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/equipe-vendas': typeof AdminEquipeVendasRoute
   '/admin/estoque': typeof AdminEstoqueRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/navbar': typeof AdminNavbarRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
+  '/equipe-de-vendas/$slug': typeof EquipeDeVendasSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/catalogos/': typeof CatalogosIndexRoute
+  '/equipe-de-vendas/': typeof EquipeDeVendasIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
@@ -313,17 +334,20 @@ export interface FileRoutesByTo {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/equipe-vendas': typeof AdminEquipeVendasRoute
   '/admin/estoque': typeof AdminEstoqueRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/navbar': typeof AdminNavbarRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
+  '/equipe-de-vendas/$slug': typeof EquipeDeVendasSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin': typeof AdminIndexRoute
   '/catalogos': typeof CatalogosIndexRoute
+  '/equipe-de-vendas': typeof EquipeDeVendasIndexRoute
   '/produtos': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
@@ -356,17 +380,20 @@ export interface FileRoutesById {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/equipe-vendas': typeof AdminEquipeVendasRoute
   '/admin/estoque': typeof AdminEstoqueRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/navbar': typeof AdminNavbarRoute
   '/admin/produtos': typeof AdminProdutosRoute
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
+  '/equipe-de-vendas/$slug': typeof EquipeDeVendasSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/catalogos/': typeof CatalogosIndexRoute
+  '/equipe-de-vendas/': typeof EquipeDeVendasIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
@@ -400,17 +427,20 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/equipe-vendas'
     | '/admin/estoque'
     | '/admin/footer'
     | '/admin/navbar'
     | '/admin/produtos'
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
+    | '/equipe-de-vendas/$slug'
     | '/paginas/$slug'
     | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin/'
     | '/catalogos/'
+    | '/equipe-de-vendas/'
     | '/produtos/'
     | '/admin/contas/$id'
     | '/admin/vendas/historico'
@@ -439,17 +469,20 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/equipe-vendas'
     | '/admin/estoque'
     | '/admin/footer'
     | '/admin/navbar'
     | '/admin/produtos'
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
+    | '/equipe-de-vendas/$slug'
     | '/paginas/$slug'
     | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin'
     | '/catalogos'
+    | '/equipe-de-vendas'
     | '/produtos'
     | '/admin/contas/$id'
     | '/admin/vendas/historico'
@@ -481,17 +514,20 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/equipe-vendas'
     | '/admin/estoque'
     | '/admin/footer'
     | '/admin/navbar'
     | '/admin/produtos'
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
+    | '/equipe-de-vendas/$slug'
     | '/paginas/$slug'
     | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin/'
     | '/catalogos/'
+    | '/equipe-de-vendas/'
     | '/produtos/'
     | '/admin/contas/$id'
     | '/admin/vendas/historico'
@@ -517,8 +553,10 @@ export interface RootRouteChildren {
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
   UnidadesRoute: typeof UnidadesRoute
+  EquipeDeVendasSlugRoute: typeof EquipeDeVendasSlugRoute
   PaginasSlugRoute: typeof PaginasSlugRoute
   PedidoIdRoute: typeof PedidoIdRoute
+  EquipeDeVendasIndexRoute: typeof EquipeDeVendasIndexRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
@@ -630,6 +668,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProdutosIndexRouteImport
       parentRoute: typeof ProdutosRoute
     }
+    '/equipe-de-vendas/': {
+      id: '/equipe-de-vendas/'
+      path: '/equipe-de-vendas'
+      fullPath: '/equipe-de-vendas/'
+      preLoaderRoute: typeof EquipeDeVendasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalogos/': {
       id: '/catalogos/'
       path: '/'
@@ -663,6 +708,13 @@ declare module '@tanstack/react-router' {
       path: '/paginas/$slug'
       fullPath: '/paginas/$slug'
       preLoaderRoute: typeof PaginasSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipe-de-vendas/$slug': {
+      id: '/equipe-de-vendas/$slug'
+      path: '/equipe-de-vendas/$slug'
+      fullPath: '/equipe-de-vendas/$slug'
+      preLoaderRoute: typeof EquipeDeVendasSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogos/$slug': {
@@ -705,6 +757,13 @@ declare module '@tanstack/react-router' {
       path: '/estoque'
       fullPath: '/admin/estoque'
       preLoaderRoute: typeof AdminEstoqueRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/equipe-vendas': {
+      id: '/admin/equipe-vendas'
+      path: '/equipe-vendas'
+      fullPath: '/admin/equipe-vendas'
+      preLoaderRoute: typeof AdminEquipeVendasRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/configuracoes': {
@@ -816,6 +875,7 @@ interface AdminRouteChildren {
   AdminCatalogosRoute: typeof AdminCatalogosRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminEquipeVendasRoute: typeof AdminEquipeVendasRoute
   AdminEstoqueRoute: typeof AdminEstoqueRoute
   AdminFooterRoute: typeof AdminFooterRoute
   AdminNavbarRoute: typeof AdminNavbarRoute
@@ -837,6 +897,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogosRoute: AdminCatalogosRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminEquipeVendasRoute: AdminEquipeVendasRoute,
   AdminEstoqueRoute: AdminEstoqueRoute,
   AdminFooterRoute: AdminFooterRoute,
   AdminNavbarRoute: AdminNavbarRoute,
@@ -895,8 +956,10 @@ const rootRouteChildren: RootRouteChildren = {
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,
   UnidadesRoute: UnidadesRoute,
+  EquipeDeVendasSlugRoute: EquipeDeVendasSlugRoute,
   PaginasSlugRoute: PaginasSlugRoute,
   PedidoIdRoute: PedidoIdRoute,
+  EquipeDeVendasIndexRoute: EquipeDeVendasIndexRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }
