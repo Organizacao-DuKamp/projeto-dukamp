@@ -30,3 +30,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# remover .env
+
+.env
+.env.*
+!.env.example
