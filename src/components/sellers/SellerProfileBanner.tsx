@@ -1,6 +1,6 @@
 import type { Seller } from "@/lib/sellers";
 import { formatPhoneDisplay, telHref, whatsappUrl } from "@/lib/sellers";
-import { optimizedImage } from "@/lib/image-url";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { MapPin, Phone, Star, MessageCircle, ImageIcon } from "lucide-react";
 import bannerBg from "@/assets/seller-banner-bg.jpg";
 
