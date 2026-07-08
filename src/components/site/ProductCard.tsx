@@ -37,7 +37,9 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
   const rawImage = p.images?.[0] || "/placeholder.svg";
-  const image = optimizedImage(rawImage, { width: 400, quality: 75 });
+  const image = optimizedImage(rawImage, { width: 320, quality: 65 });
+  const srcSet = optimizedSrcset(rawImage, [160, 240, 320, 480], 65);
+
   const installments = Math.max(1, Number(p.installments ?? 1));
   const displayPrice = priceForAccount(p, accountType);
   const displayPix = pixPriceForAccount(p, accountType);
