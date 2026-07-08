@@ -20,12 +20,15 @@ export function SellerCard({ seller }: { seller: Seller }) {
           aria-hidden
         />
         <div className="relative h-28 w-28 rounded-full overflow-hidden bg-muted ring-4 ring-card">
-          <img
-            src={optimizedImage(seller.photo_url, { width: 300, quality: 80 })}
+          <OptimizedImage
+            src={seller.photo_url}
             alt={seller.name}
-            className="h-full w-full object-cover"
-            loading="lazy"
-            decoding="async"
+            width={112}
+            height={112}
+            quality={80}
+            srcsetWidths={[112, 168, 224]}
+            sizes="112px"
+            wrapperClassName="w-full h-full"
           />
         </div>
       </div>
