@@ -67,6 +67,16 @@ function AdCard({ ad }: { ad: Ad }) {
   const [idx, setIdx] = useState(0);
   const timer = useRef<number | null>(null);
 
+  // Preload all images so crossfades never flash white
+  useEffect(() => {
+    items.forEach((url) => {
+      if (!isVideoUrl(url)) {
+        const im = new Image();
+        im.src = url;
+      }
+    });
+  }, [items]);
+
   useEffect(() => {
     if (items.length <= 1) return;
     timer.current = window.setInterval(() => {
@@ -83,18 +93,32 @@ function AdCard({ ad }: { ad: Ad }) {
     <div className="rounded-lg border bg-card overflow-hidden hover:shadow-md transition-shadow">
       {current && (
         <div className="relative">
-          <AdaptiveMedia key={current} url={current} />
+          <AdaptiveMedia url={current} />
           {items.length > 1 && (
-            <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
-              {items.map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-1.5 rounded-full transition-all ${
-                    i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"
-                  }`}
-                />
-              ))}
-            </div>
+            <>
+              {items.map((url, i) =>
+                i === idx ? null : (
+                  <div
+                    key={url}
+                    className={`absolute inset-0 transition-opacity duration-700 ease-in-out pointer-events-none ${
+                      i === idx ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    <AdaptiveMedia url={url} />
+                  </div>
+                ),
+              )}
+              <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
+                {items.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
