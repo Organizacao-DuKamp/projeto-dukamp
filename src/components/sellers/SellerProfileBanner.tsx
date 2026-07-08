@@ -42,16 +42,16 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
             aria-hidden
           />
 
-          {/* Curva amarela decorativa - canto inferior esquerdo */}
+          {/* Curvas decorativas ATRÁS da pessoa (canto superior esq. — dão contexto) */}
           <div
-            className="pointer-events-none absolute -left-16 -bottom-16 h-56 w-56 rounded-full bg-[#f6c515]/90 md:h-72 md:w-72"
+            className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-[#f6c515]/80 md:h-64 md:w-64"
             aria-hidden
           />
-          {/* Curva vermelha decorativa - sobre a amarela */}
           <div
-            className="pointer-events-none absolute -left-10 -bottom-24 h-48 w-48 rounded-full bg-[#d81f26] md:h-64 md:w-64"
+            className="pointer-events-none absolute -left-16 -top-28 h-40 w-40 rounded-full bg-[#d81f26]/90 md:h-52 md:w-52"
             aria-hidden
           />
+
 
           {/* Pessoa recortada (sem fundo) por cima de tudo */}
           <div className="relative z-10 h-full flex items-end justify-center pt-6 md:pt-8">
