@@ -36,7 +36,7 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
         </div>
 
         {/* ============ DIREITA — informações do vendedor ============ */}
-        <div className="relative overflow-hidden bg-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+        <div className="relative overflow-hidden bg-white p-3 sm:p-6 md:p-10 flex flex-col justify-center">
           {/* Faixas decorativas discretas — canto superior direito */}
           <div
             className="pointer-events-none absolute -right-16 -top-16 h-36 w-36 rounded-full bg-[#f6c515]/80 md:h-44 md:w-44"
