@@ -11,6 +11,7 @@ import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { RichContent } from "@/components/site/RichContent";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 
 export const Route = createFileRoute("/produtos/$slug")({
