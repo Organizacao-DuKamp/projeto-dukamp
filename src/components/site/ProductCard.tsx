@@ -4,7 +4,8 @@ import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
 import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
-import { optimizedImage, optimizedSrcset } from "@/lib/image-url";
+import { optimizedImage } from "@/lib/image-url";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { toast } from "sonner";
 
 export type ProductLite = {
