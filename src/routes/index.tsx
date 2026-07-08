@@ -130,31 +130,35 @@ function Home() {
         }
 
         // Static class maps so Tailwind JIT picks them up.
+        // Packing só é ativado a partir do 2xl (>=1536px), onde 5 colunas
+        // garantem ~290px por card. Abaixo disso, cada seção ocupa a linha
+        // inteira com seu grid interno responsivo — nunca esprememos cards
+        // para forçar encaixe lateral.
         const spanCls: Record<CatSec["n"], string> = {
-          1: "xl:col-span-1",
-          2: "xl:col-span-2",
-          3: "xl:col-span-3",
-          4: "xl:col-span-4",
-          5: "xl:col-span-5",
+          1: "2xl:col-span-1",
+          2: "2xl:col-span-2",
+          3: "2xl:col-span-3",
+          4: "2xl:col-span-4",
+          5: "2xl:col-span-5",
         };
         const innerCls: Record<CatSec["n"], string> = {
-          1: "xl:grid-cols-1",
-          2: "xl:grid-cols-2",
-          3: "xl:grid-cols-3",
-          4: "xl:grid-cols-4",
-          5: "xl:grid-cols-5",
+          1: "2xl:grid-cols-1",
+          2: "2xl:grid-cols-2",
+          3: "2xl:grid-cols-3",
+          4: "2xl:grid-cols-4",
+          5: "2xl:grid-cols-5",
         };
 
         return rows.map((row, rowIdx) => {
           const key = row.map((s) => s.cat.id).join("+");
           const content = (
-            <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-5 xl:gap-6">
+            <div className="mt-10 grid grid-cols-1 gap-6 2xl:grid-cols-5 2xl:gap-6">
               {row.map((s, i) => (
                 <section
                   key={s.cat.id}
                   className={`min-w-0 ${spanCls[s.n]} ${
                     row.length > 1 && i > 0
-                      ? "xl:border-l xl:border-border xl:pl-6"
+                      ? "2xl:border-l 2xl:border-border 2xl:pl-6"
                       : ""
                   }`}
                 >
@@ -169,7 +173,7 @@ function Home() {
                     </Button>
                   </div>
                   <div
-                    className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3`}
+                    className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ${innerCls[s.n]} gap-3`}
                   >
                     {s.prods.map((p) => (
                       <ProductCard key={p.id} p={p as any} />
