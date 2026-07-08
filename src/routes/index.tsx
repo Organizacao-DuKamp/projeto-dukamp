@@ -22,13 +22,16 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const PRODUCT_COLS =
+  "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at";
+
 function Home() {
   const featured = useQuery({
     queryKey: ["products", "featured"],
     queryFn: async () => {
       const { data } = await supabase
         .from("products")
-        .select("*")
+        .select(PRODUCT_COLS)
         .eq("active", true)
         .eq("featured", true)
         .gt("stock", 0)
@@ -41,33 +44,32 @@ function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from("catalogs")
-        .select("*")
+        .select("id,name,slug,active")
         .eq("active", true)
         .order("name");
       return data ?? [];
     },
   });
   const catIds = (categories.data ?? []).map((c) => c.id).sort().join(",");
+  // One query for all categories, grouped client-side (was N queries)
   const allProducts = useQuery({
     enabled: !!categories.data && categories.data.length > 0,
-    queryKey: ["products", "by-cat", catIds],
+    queryKey: ["products", "home-by-cat", catIds],
     queryFn: async () => {
       const ids = (categories.data ?? []).map((c) => c.id);
-      const results = await Promise.all(
-        ids.map((id) =>
-          supabase
-            .from("products")
-            .select("*")
-            .eq("active", true)
-            .gt("stock", 0)
-            .eq("catalog_id", id)
-            .order("created_at", { ascending: false })
-            .limit(8),
-        ),
-      );
-      return results.flatMap((r) => r.data ?? []);
+      if (ids.length === 0) return [];
+      const { data } = await supabase
+        .from("products")
+        .select(PRODUCT_COLS)
+        .eq("active", true)
+        .gt("stock", 0)
+        .in("catalog_id", ids)
+        .order("created_at", { ascending: false });
+      return data ?? [];
     },
   });
+
+
 
 
   return (
