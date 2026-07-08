@@ -15,9 +15,9 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-border bg-white shadow-xl">
-      <div className="grid md:grid-cols-2 md:min-h-[360px]">
+      <div className="grid grid-cols-2 min-h-[220px] md:min-h-[360px]">
         {/* ============ ESQUERDA — arte pronta enviada pelo admin ============ */}
-        <div className="relative min-h-[240px] md:min-h-full bg-muted">
+        <div className="relative min-h-full bg-muted">
           {hasHero ? (
             <img
               src={optimizedImage(heroImage, { width: 1200, quality: 90 })}
@@ -36,7 +36,7 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
         </div>
 
         {/* ============ DIREITA — informações do vendedor ============ */}
-        <div className="relative overflow-hidden bg-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+        <div className="relative overflow-hidden bg-white p-3 sm:p-6 md:p-10 flex flex-col justify-center">
           {/* Faixas decorativas discretas — canto superior direito */}
           <div
             className="pointer-events-none absolute -right-16 -top-16 h-36 w-36 rounded-full bg-[#f6c515]/80 md:h-44 md:w-44"
@@ -56,31 +56,31 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
             aria-hidden
           />
 
-          <div className="relative space-y-3 text-center md:text-left">
+          <div className="relative space-y-2 md:space-y-3 text-left">
 
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#d81f26] px-3 py-1 text-xs font-bold text-white shadow">
               <Star className="h-3.5 w-3.5 fill-white" /> DESTAQUE
             </span>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black leading-tight text-foreground">
+            <h1 className="text-lg sm:text-2xl md:text-4xl font-black leading-tight text-foreground break-words">
               {seller.name}
             </h1>
 
             {seller.role && (
-              <p className="text-base sm:text-lg font-semibold text-[#d81f26]">
+              <p className="text-sm sm:text-base md:text-lg font-semibold text-[#d81f26]">
                 {seller.role}
               </p>
             )}
 
-            <div className="space-y-1.5 pt-1 text-sm sm:text-base text-foreground/90">
+            <div className="space-y-1.5 pt-1 text-xs sm:text-sm md:text-base text-foreground/90">
               {seller.region && (
-                <p className="flex items-center justify-center gap-2 md:justify-start">
+                <p className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 shrink-0 text-[#d81f26]" />
-                  <span>{seller.region}</span>
+                  <span className="break-words">{seller.region}</span>
                 </p>
               )}
               {phoneDisplay && (
-                <p className="flex items-center justify-center gap-2 md:justify-start">
+                <p className="flex items-center gap-2">
                   <Phone className="h-4 w-4 shrink-0 text-[#d81f26]" />
                   <a
                     href={telHref(seller.phone ?? seller.whatsapp)}
@@ -98,10 +98,10 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
                   href={wa}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-bold text-white shadow-lg transition-colors hover:bg-[#1fbe5a] sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-3 py-2 text-xs sm:text-sm md:text-base md:px-6 md:py-3 font-bold text-white shadow-lg transition-colors hover:bg-[#1fbe5a] sm:w-auto"
                 >
-                  <MessageCircle className="h-5 w-5 fill-white" />
-                  Falar no WhatsApp
+                  <MessageCircle className="h-4 w-4 md:h-5 md:w-5 fill-white" />
+                  <span className="whitespace-nowrap">WhatsApp</span>
                 </a>
               </div>
             )}
