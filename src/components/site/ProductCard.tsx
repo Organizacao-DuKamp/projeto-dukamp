@@ -70,13 +70,18 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
       <div className="aspect-[5/4] bg-white overflow-hidden">
         <img
           src={image}
+          srcSet={srcSet}
+          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 18vw"
           alt={p.name}
+          width={320}
+          height={256}
           loading={eager ? "eager" : "lazy"}
           fetchPriority={eager ? "high" : "auto"}
           decoding="async"
           className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform"
         />
       </div>
+
 
       <div className="p-3 flex-1 flex flex-col">
         {p.brand && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.brand}</div>}
