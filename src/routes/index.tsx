@@ -115,8 +115,14 @@ function Home() {
             return { cat, prods, n };
           })
           .filter((s) => s.prods.length > 0)
-          // Ordena das categorias com mais produtos para as com menos
-          .sort((a, b) => b.prods.length - a.prods.length);
+          // Ordena por quantidade de produtos: mais → menos
+          // (bucket 6+, 5, 4, 3, 2, 1). Tie-break por nome pra ficar estável.
+          .sort(
+            (a, b) =>
+              b.prods.length - a.prods.length ||
+              a.cat.name.localeCompare(b.cat.name),
+          );
+
 
         const remaining = [...sections];
         const rows: CatSec[][] = [];
@@ -163,13 +169,7 @@ function Home() {
           4: "xl:col-span-4",
           5: "xl:col-span-5",
         };
-        const innerCls: Record<CatSec["n"], string> = {
-          1: "xl:grid-cols-1",
-          2: "xl:grid-cols-2",
-          3: "xl:grid-cols-3",
-          4: "xl:grid-cols-4",
-          5: "xl:grid-cols-5",
-        };
+
 
         return rows.map((row, rowIdx) => {
           const key = row.map((s) => s.cat.id).join("+");
