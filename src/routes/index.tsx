@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCard } from "@/components/site/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { LazyMount } from "@/components/site/LazyMount";
+
 
 
 export const Route = createFileRoute("/")({
@@ -26,6 +28,8 @@ const PRODUCT_COLS =
   "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at";
 
 function Home() {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
   const featured = useQuery({
     queryKey: ["products", "featured"],
     queryFn: async () => {
@@ -96,19 +100,17 @@ function Home() {
         type CatSec = {
           cat: { id: string; name: string; slug: string };
           prods: any[];
-          n: 1 | 2 | 3 | 4;
+          n: 1 | 2 | 3 | 4 | 5;
         };
-        // Cap por card cap=4: no xl (>=1280px) 4 colunas dão ~290px cada,
-        // largura confortável. Categorias com 5 produtos exibem 4 no
-        // packing desktop (o 5º aparece em breakpoints menores/mobile via
-        // grid interno). Isso ativa o preenchimento inteligente já a
-        // partir do desktop comum, não só em telas ultra-largas.
-        const CAP = 4;
+        // Até 5 cards por linha no xl (>=1280px). Categorias com 6+
+        // produtos exibem os 5 primeiros por padrão; "Ver todos"
+        // expande inline sem quebrar o layout.
+        const CAP = 5;
         const sections: CatSec[] = (categories.data ?? [])
           .map((cat) => {
-            const prods = (allProducts.data ?? [])
-              .filter((p) => p.catalog_id === cat.id)
-              .slice(0, 5);
+            const prods = (allProducts.data ?? []).filter(
+              (p) => p.catalog_id === cat.id,
+            );
             const n = Math.min(prods.length, CAP) as CatSec["n"];
             return { cat, prods, n };
           })
@@ -151,46 +153,70 @@ function Home() {
           2: "xl:col-span-2",
           3: "xl:col-span-3",
           4: "xl:col-span-4",
+          5: "xl:col-span-5",
         };
         const innerCls: Record<CatSec["n"], string> = {
           1: "xl:grid-cols-1",
           2: "xl:grid-cols-2",
           3: "xl:grid-cols-3",
           4: "xl:grid-cols-4",
+          5: "xl:grid-cols-5",
         };
 
         return rows.map((row, rowIdx) => {
           const key = row.map((s) => s.cat.id).join("+");
           const content = (
-            <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-4 xl:gap-6">
-              {row.map((s, i) => (
-                <section
-                  key={s.cat.id}
-                  className={`min-w-0 ${spanCls[s.n]} ${
-                    row.length > 1 && i > 0
-                      ? "xl:border-l xl:border-border xl:pl-6"
-                      : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-3 gap-2">
-                    <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
-                      {s.cat.name}
-                    </h2>
-                    <Button asChild variant="ghost" size="sm" className="shrink-0">
-                      <Link to="/produtos" search={{ categoria: s.cat.slug } as any}>
-                        Ver todos <ChevronRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                  <div
-                    className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3`}
+            <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-5 xl:gap-6">
+              {row.map((s, i) => {
+                const isExpanded = !!expanded[s.cat.id];
+                const hasMore = s.prods.length > s.n;
+                const visible = isExpanded ? s.prods : s.prods.slice(0, s.n);
+                return (
+                  <section
+                    key={s.cat.id}
+                    className={`min-w-0 ${spanCls[s.n]} ${
+                      row.length > 1 && i > 0
+                        ? "xl:border-l xl:border-border xl:pl-6"
+                        : ""
+                    }`}
                   >
-                    {s.prods.map((p) => (
-                      <ProductCard key={p.id} p={p as any} />
-                    ))}
-                  </div>
-                </section>
-              ))}
+                    <div className="flex items-center justify-between mb-3 gap-2">
+                      <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
+                        {s.cat.name}
+                      </h2>
+                      {hasMore ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="shrink-0"
+                          onClick={() =>
+                            setExpanded((prev) => ({
+                              ...prev,
+                              [s.cat.id]: !prev[s.cat.id],
+                            }))
+                          }
+                        >
+                          {isExpanded ? "Ver menos" : "Ver todos"}{" "}
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button asChild variant="ghost" size="sm" className="shrink-0">
+                          <Link to="/produtos" search={{ categoria: s.cat.slug } as any}>
+                            Ver todos <ChevronRight className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                    <div
+                      className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3`}
+                    >
+                      {visible.map((p) => (
+                        <ProductCard key={p.id} p={p as any} />
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
             </div>
           );
           if (rowIdx === 0) return <div key={key}>{content}</div>;
@@ -201,6 +227,7 @@ function Home() {
           );
         });
       })()}
+
     </SiteLayout>
   );
 }
