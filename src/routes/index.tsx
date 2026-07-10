@@ -217,14 +217,14 @@ function Home() {
                       )}
                     </div>
                     <div
-                      className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3 justify-items-start`}
+                      className="grid gap-3 justify-start [grid-template-columns:repeat(auto-fill,minmax(160px,220px))] sm:[grid-template-columns:repeat(auto-fill,minmax(180px,240px))] lg:[grid-template-columns:repeat(auto-fill,minmax(200px,260px))]"
                     >
                       {visible.map((p) => (
-                        <div key={p.id} className="w-full max-w-[260px]">
-                          <ProductCard p={p as any} />
-                        </div>
+                        <ProductCard key={p.id} p={p as any} />
                       ))}
                     </div>
+
+
 
                   </section>
                 );
