@@ -115,8 +115,14 @@ function Home() {
             return { cat, prods, n };
           })
           .filter((s) => s.prods.length > 0)
-          // Ordena das categorias com mais produtos para as com menos
-          .sort((a, b) => b.prods.length - a.prods.length);
+          // Ordena por quantidade de produtos: mais → menos
+          // (bucket 6+, 5, 4, 3, 2, 1). Tie-break por nome pra ficar estável.
+          .sort(
+            (a, b) =>
+              b.prods.length - a.prods.length ||
+              a.cat.name.localeCompare(b.cat.name),
+          );
+
 
         const remaining = [...sections];
         const rows: CatSec[][] = [];
