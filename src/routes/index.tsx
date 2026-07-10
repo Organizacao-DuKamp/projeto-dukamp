@@ -216,16 +216,14 @@ function Home() {
                         </Button>
                       )}
                     </div>
-                    <div className="flex flex-wrap justify-start items-start gap-3">
+                    <div
+                      className="grid gap-3 justify-start [grid-template-columns:repeat(auto-fill,minmax(160px,220px))] sm:[grid-template-columns:repeat(auto-fill,minmax(180px,240px))] lg:[grid-template-columns:repeat(auto-fill,minmax(200px,260px))]"
+                    >
                       {visible.map((p) => (
-                        <div
-                          key={p.id}
-                          className="w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1.5rem)/3)] lg:w-[calc((100%-2.25rem)/4)] max-w-[260px]"
-                        >
-                          <ProductCard p={p as any} />
-                        </div>
+                        <ProductCard key={p.id} p={p as any} />
                       ))}
                     </div>
+
 
 
                   </section>
