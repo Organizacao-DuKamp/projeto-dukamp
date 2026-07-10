@@ -216,15 +216,17 @@ function Home() {
                         </Button>
                       )}
                     </div>
-                    <div
-                      className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3 justify-items-start`}
-                    >
+                    <div className="flex flex-wrap justify-start items-start gap-3">
                       {visible.map((p) => (
-                        <div key={p.id} className="w-full max-w-[260px]">
+                        <div
+                          key={p.id}
+                          className="w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1.5rem)/3)] lg:w-[calc((100%-2.25rem)/4)] max-w-[260px]"
+                        >
                           <ProductCard p={p as any} />
                         </div>
                       ))}
                     </div>
+
 
                   </section>
                 );
