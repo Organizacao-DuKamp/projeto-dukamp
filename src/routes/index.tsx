@@ -28,6 +28,8 @@ const PRODUCT_COLS =
   "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at";
 
 function Home() {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
   const featured = useQuery({
     queryKey: ["products", "featured"],
     queryFn: async () => {
