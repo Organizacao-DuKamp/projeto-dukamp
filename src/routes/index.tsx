@@ -192,11 +192,12 @@ function Home() {
                 return (
                   <section
                     key={s.cat.id}
-                    className={`min-w-0 ${spanCls[s.n]} ${
+                    className={`min-w-0 ${row.length === 1 ? "xl:col-span-5" : spanCls[s.n]} ${
                       row.length > 1 && i > 0
                         ? "xl:border-l xl:border-border xl:pl-6"
                         : ""
                     }`}
+
                   >
                     <div className="flex items-center justify-between mb-3 gap-2">
                       <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
