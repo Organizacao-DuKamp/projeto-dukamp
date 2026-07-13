@@ -80,7 +80,7 @@ function Home() {
 
   return (
     <SiteLayout>
-      <section>
+      <section className="lg:min-h-[calc(100vh-var(--site-header-offset,12rem))] lg:pb-8">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3">
             Produtos em destaque
