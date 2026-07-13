@@ -16,13 +16,28 @@ export type Database = {
     Tables: {
       account_requests: {
         Row: {
+          apartamento_info: string | null
           cnpj: string | null
+          cnpj_propriedade: string | null
+          cobranca_bairro: string | null
+          cobranca_cep: string | null
+          cobranca_email: string | null
+          cobranca_municipio: string | null
+          cobranca_numero: string | null
+          cobranca_rua: string | null
+          cobranca_telefone: string | null
           contact_email: string
           cpf: string | null
           created_at: string
           email: string
+          estado_propriedade: string | null
+          fazenda: string | null
           full_name: string
           id: string
+          inscricao_estadual: string | null
+          is_apartamento: boolean | null
+          municipio_propriedade: string | null
+          nome_propriedade: string | null
           phone: string
           requested_type: Database["public"]["Enums"]["requested_account_type"]
           review_notes: string | null
@@ -34,13 +49,28 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          apartamento_info?: string | null
           cnpj?: string | null
+          cnpj_propriedade?: string | null
+          cobranca_bairro?: string | null
+          cobranca_cep?: string | null
+          cobranca_email?: string | null
+          cobranca_municipio?: string | null
+          cobranca_numero?: string | null
+          cobranca_rua?: string | null
+          cobranca_telefone?: string | null
           contact_email: string
           cpf?: string | null
           created_at?: string
           email: string
+          estado_propriedade?: string | null
+          fazenda?: string | null
           full_name: string
           id?: string
+          inscricao_estadual?: string | null
+          is_apartamento?: boolean | null
+          municipio_propriedade?: string | null
+          nome_propriedade?: string | null
           phone: string
           requested_type: Database["public"]["Enums"]["requested_account_type"]
           review_notes?: string | null
@@ -52,13 +82,28 @@ export type Database = {
           user_id: string
         }
         Update: {
+          apartamento_info?: string | null
           cnpj?: string | null
+          cnpj_propriedade?: string | null
+          cobranca_bairro?: string | null
+          cobranca_cep?: string | null
+          cobranca_email?: string | null
+          cobranca_municipio?: string | null
+          cobranca_numero?: string | null
+          cobranca_rua?: string | null
+          cobranca_telefone?: string | null
           contact_email?: string
           cpf?: string | null
           created_at?: string
           email?: string
+          estado_propriedade?: string | null
+          fazenda?: string | null
           full_name?: string
           id?: string
+          inscricao_estadual?: string | null
+          is_apartamento?: boolean | null
+          municipio_propriedade?: string | null
+          nome_propriedade?: string | null
           phone?: string
           requested_type?: Database["public"]["Enums"]["requested_account_type"]
           review_notes?: string | null
@@ -539,45 +584,90 @@ export type Database = {
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
+          apartamento_info: string | null
           approval_notified: boolean
           avatar_url: string | null
           cnpj: string | null
+          cnpj_propriedade: string | null
+          cobranca_bairro: string | null
+          cobranca_cep: string | null
+          cobranca_email: string | null
+          cobranca_municipio: string | null
+          cobranca_numero: string | null
+          cobranca_rua: string | null
+          cobranca_telefone: string | null
           contact_email: string | null
           cpf: string | null
           created_at: string
           email: string | null
+          estado_propriedade: string | null
+          fazenda: string | null
           full_name: string | null
           id: string
+          inscricao_estadual: string | null
+          is_apartamento: boolean | null
+          municipio_propriedade: string | null
+          nome_propriedade: string | null
           phone: string | null
           uf: string | null
           updated_at: string
         }
         Insert: {
           account_type?: Database["public"]["Enums"]["account_type"]
+          apartamento_info?: string | null
           approval_notified?: boolean
           avatar_url?: string | null
           cnpj?: string | null
+          cnpj_propriedade?: string | null
+          cobranca_bairro?: string | null
+          cobranca_cep?: string | null
+          cobranca_email?: string | null
+          cobranca_municipio?: string | null
+          cobranca_numero?: string | null
+          cobranca_rua?: string | null
+          cobranca_telefone?: string | null
           contact_email?: string | null
           cpf?: string | null
           created_at?: string
           email?: string | null
+          estado_propriedade?: string | null
+          fazenda?: string | null
           full_name?: string | null
           id: string
+          inscricao_estadual?: string | null
+          is_apartamento?: boolean | null
+          municipio_propriedade?: string | null
+          nome_propriedade?: string | null
           phone?: string | null
           uf?: string | null
           updated_at?: string
         }
         Update: {
           account_type?: Database["public"]["Enums"]["account_type"]
+          apartamento_info?: string | null
           approval_notified?: boolean
           avatar_url?: string | null
           cnpj?: string | null
+          cnpj_propriedade?: string | null
+          cobranca_bairro?: string | null
+          cobranca_cep?: string | null
+          cobranca_email?: string | null
+          cobranca_municipio?: string | null
+          cobranca_numero?: string | null
+          cobranca_rua?: string | null
+          cobranca_telefone?: string | null
           contact_email?: string | null
           cpf?: string | null
           created_at?: string
           email?: string | null
+          estado_propriedade?: string | null
+          fazenda?: string | null
           full_name?: string | null
           id?: string
+          inscricao_estadual?: string | null
+          is_apartamento?: boolean | null
+          municipio_propriedade?: string | null
+          nome_propriedade?: string | null
           phone?: string | null
           uf?: string | null
           updated_at?: string
@@ -768,7 +858,7 @@ export type Database = {
     }
     Enums: {
       account_request_status: "pending" | "approved" | "rejected"
-      account_type: "cliente" | "revendedor" | "produtor" | "admin"
+      account_type: "cliente" | "revendedor" | "produtor" | "admin" | "empresa"
       app_role: "admin" | "user"
       delivery_status: "preparando" | "a_caminho" | "entregue"
       payment_method: "pix" | "card"
@@ -779,7 +869,7 @@ export type Database = {
         | "rejected"
         | "cancelled"
         | "refunded"
-      requested_account_type: "revendedor" | "produtor"
+      requested_account_type: "revendedor" | "produtor" | "empresa"
       ticket_status: "open" | "in_progress" | "closed"
     }
     CompositeTypes: {
@@ -909,7 +999,7 @@ export const Constants = {
   public: {
     Enums: {
       account_request_status: ["pending", "approved", "rejected"],
-      account_type: ["cliente", "revendedor", "produtor", "admin"],
+      account_type: ["cliente", "revendedor", "produtor", "admin", "empresa"],
       app_role: ["admin", "user"],
       delivery_status: ["preparando", "a_caminho", "entregue"],
       payment_method: ["pix", "card"],
@@ -921,7 +1011,7 @@ export const Constants = {
         "cancelled",
         "refunded",
       ],
-      requested_account_type: ["revendedor", "produtor"],
+      requested_account_type: ["revendedor", "produtor", "empresa"],
       ticket_status: ["open", "in_progress", "closed"],
     },
   },
