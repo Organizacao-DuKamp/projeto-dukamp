@@ -119,7 +119,49 @@ function Home() {
               });
             return { cat, prods };
           })
-          .filter((s) => s.prods.length > 0);
+          .filter((s) => s.prods.length > 0)
+          .sort((a, b) => {
+            if (b.prods.length !== a.prods.length)
+              return b.prods.length - a.prods.length;
+            return a.cat.name.localeCompare(b.cat.name, "pt-BR");
+          });
+
+        // Bin-pack sections into desktop rows of capacity 5.
+        // Sections with 5+ visible products (or expanded) take a full row.
+        type Item = { s: (typeof sections)[number]; w: number };
+        const rows: Item[][] = [];
+        let curRow: Item[] = [];
+        let curW = 0;
+        const flush = () => {
+          if (curRow.length) rows.push(curRow);
+          curRow = [];
+          curW = 0;
+        };
+        for (const s of sections) {
+          const isExpanded = !!expanded[s.cat.id];
+          const visible = isExpanded
+            ? s.prods.length
+            : Math.min(s.prods.length, HOME_PRODUCT_LIMIT);
+          const w = Math.min(visible, 5);
+          const fullRow = visible >= 5 || isExpanded;
+          if (fullRow) {
+            flush();
+            rows.push([{ s, w: 5 }]);
+            continue;
+          }
+          if (curW + w > 5) flush();
+          curRow.push({ s, w });
+          curW += w;
+        }
+        flush();
+
+        const colSpan: Record<number, string> = {
+          1: "lg:col-span-1",
+          2: "lg:col-span-2",
+          3: "lg:col-span-3",
+          4: "lg:col-span-4",
+          5: "lg:col-span-5",
+        };
 
         const renderSection = (s: (typeof sections)[number]) => {
           const isExpanded = !!expanded[s.cat.id];
@@ -128,7 +170,7 @@ function Home() {
             ? s.prods
             : s.prods.slice(0, HOME_PRODUCT_LIMIT);
           return (
-            <section className="mt-10 min-w-0">
+            <section className="min-w-0">
               <div className="flex items-center justify-between mb-3 gap-2">
                 <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
                   {s.cat.name}
@@ -156,7 +198,7 @@ function Home() {
                   </Button>
                 )}
               </div>
-              <div className="product-showcase-grid">
+              <div className="category-cards">
                 {visible.map((p) => (
                   <div key={p.id} className="product-showcase-card">
                     <ProductCard p={p as any} />
@@ -167,15 +209,26 @@ function Home() {
           );
         };
 
-        return sections.map((s, idx) => {
-          if (idx === 0) return <div key={s.cat.id}>{renderSection(s)}</div>;
+        return rows.map((row, idx) => {
+          const key = row.map((r) => r.s.cat.id).join("|");
+          const content = (
+            <div className="mt-10 grid grid-cols-1 lg:grid-cols-5 gap-6">
+              {row.map(({ s, w }) => (
+                <div key={s.cat.id} className={colSpan[w]}>
+                  {renderSection(s)}
+                </div>
+              ))}
+            </div>
+          );
+          if (idx === 0) return <div key={key}>{content}</div>;
           return (
-            <LazyMount key={s.cat.id} minHeight={480}>
-              {renderSection(s)}
+            <LazyMount key={key} minHeight={480}>
+              {content}
             </LazyMount>
           );
         });
       })()}
+
 
     </SiteLayout>
   );
