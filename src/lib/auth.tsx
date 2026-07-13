@@ -3,7 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { PROTECTED_ADMIN_EMAIL } from "@/lib/constants";
 
-export type AccountType = "cliente" | "produtor" | "admin";
+export type AccountType = "cliente" | "produtor" | "empresa" | "admin";
 
 type AuthCtx = {
   user: User | null;
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const p: any = profileR.data ?? {};
     const t = (p.account_type ?? "cliente") as AccountType;
     setAccountType(t);
-    if (p.approval_notified === false && t === "produtor") {
+    if (p.approval_notified === false && (t === "produtor" || t === "empresa")) {
       setApprovalNotice(t);
     } else {
       setApprovalNotice(null);
