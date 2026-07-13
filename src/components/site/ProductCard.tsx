@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
@@ -35,6 +35,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: boolean }) {
   const { add } = useCart();
+  const navigate = useNavigate();
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
   const rawImage = p.images?.[0] || "/placeholder.svg";
@@ -116,17 +117,19 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
           >
             <ShoppingCart className="h-4 w-4 mr-1.5" /> {p.stock > 0 ? "Comprar" : "Indisponível"}
           </Button>
-          <a
-            href={wa}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              navigate({ to: "/equipe-de-vendas" });
+            }}
             aria-label="Comprar pelo WhatsApp"
             className="relative z-20 w-full inline-flex items-center justify-center gap-2 rounded-md bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-semibold h-10 px-3 shadow-sm hover:shadow-md ring-1 ring-black/5 transition-all"
           >
             <WhatsAppIcon className="h-4 w-4 shrink-0" />
             <span>WhatsApp</span>
-          </a>
+          </button>
         </div>
       </div>
     </div>
