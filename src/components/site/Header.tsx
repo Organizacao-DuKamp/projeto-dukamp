@@ -124,9 +124,25 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild variant="ghost" size="icon" title="Entrar">
-                <Link to="/auth"><User className="h-5 w-5" /></Link>
-              </Button>
+              <>
+                <Button
+                  asChild
+                  size="sm"
+                  className="hidden sm:inline-flex bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm gap-1.5 animate-in fade-in"
+                  title="Criar sua conta"
+                >
+                  <Link to="/auth" search={{ tab: "register" } as any}>
+                    <Plus className="h-4 w-4" />
+                    Novo cliente? Cadastre-se
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" size="sm" title="Entrar">
+                  <Link to="/auth">
+                    <User className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Entrar</span>
+                  </Link>
+                </Button>
+              </>
             )}
 
             <Sheet>
