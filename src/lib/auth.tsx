@@ -3,7 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { PROTECTED_ADMIN_EMAIL } from "@/lib/constants";
 
-export type AccountType = "cliente" | "produtor" | "admin";
+export type AccountType = "cliente" | "produtor" | "empresa" | "admin";
 
 type AuthCtx = {
   user: User | null;
