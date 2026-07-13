@@ -35,6 +35,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: boolean }) {
   const { add } = useCart();
+  const navigate = useNavigate();
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
   const rawImage = p.images?.[0] || "/placeholder.svg";
