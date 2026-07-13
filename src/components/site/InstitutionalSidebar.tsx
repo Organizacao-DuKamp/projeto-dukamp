@@ -26,8 +26,7 @@ function AdaptiveMedia({ url }: { url: string }) {
   const [loaded, setLoaded] = useState(false);
   const video = isVideoUrl(url);
 
-  // clamp so extremely tall/wide media stays elegant in the sidebar
-  const clamp = (r: number) => Math.max(3 / 4, Math.min(16 / 9, r));
+
 
   return (
     <div
