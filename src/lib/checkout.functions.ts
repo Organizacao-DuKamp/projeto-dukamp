@@ -103,7 +103,7 @@ function parseCorreiosXmlTag(xml: string, tag: string) {
   return match?.[1]?.trim() || "";
 }
 
-async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingPackage) {
+async function calculateLegacyCorreiosPackage(cepDest: string, servico: ServiceName, pacote: ShippingPackage) {
   const url = new URL("https://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx");
   url.searchParams.set("nCdEmpresa", "");
   url.searchParams.set("sDsSenha", "");
@@ -118,7 +118,7 @@ async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingP
   url.searchParams.set("sCdMaoPropria", "N");
   url.searchParams.set("nVlValorDeclarado", "0");
   url.searchParams.set("sCdAvisoRecebimento", "N");
-  url.searchParams.set("nCdServico", CORREIOS_SERVICO_PUBLICO);
+  url.searchParams.set("nCdServico", SERVICES[servico].legacy);
   url.searchParams.set("StrRetorno", "xml");
   url.searchParams.set("nIndicaCalculo", "3");
 
@@ -145,18 +145,18 @@ async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingP
   return { valor, prazoDias: Number.isFinite(prazoDias) && prazoDias > 0 ? prazoDias : 7 };
 }
 
-async function calculateLegacyCorreiosShipping(cepDest: string, pacotes: ShippingPackage[]) {
+async function calculateLegacyCorreiosShipping(cepDest: string, servico: ServiceName, pacotes: ShippingPackage[]) {
   let valor = 0;
   let prazoDias = 0;
 
   for (const pacote of pacotes) {
-    const result = await calculateLegacyCorreiosPackage(cepDest, pacote);
+    const result = await calculateLegacyCorreiosPackage(cepDest, servico, pacote);
     valor += result.valor;
     prazoDias = Math.max(prazoDias, result.prazoDias);
   }
 
   return {
-    servico: CORREIOS_SERVICO_NOME,
+    servico,
     valor: Number(valor.toFixed(2)),
     prazoDias: prazoDias || 7,
   };
