@@ -91,7 +91,7 @@ function Page() {
               <CarouselContent>
                 {images.map((src, i) => (
                   <CarouselItem key={i}>
-                    <div className="aspect-square rounded-lg bg-white border overflow-hidden">
+                    <ZoomBox>
                       <OptimizedImage
                         src={src}
                         alt={`${p.name} ${i + 1}`}
@@ -105,7 +105,7 @@ function Page() {
                         wrapperClassName="w-full h-full bg-white"
                         className="p-4"
                       />
-                    </div>
+                    </ZoomBox>
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -113,7 +113,7 @@ function Page() {
               <CarouselNext className="right-2" />
             </Carousel>
           ) : (
-            <div className="aspect-square rounded-lg bg-white border overflow-hidden">
+            <ZoomBox>
               <OptimizedImage
                 src={images[0]}
                 alt={p.name}
