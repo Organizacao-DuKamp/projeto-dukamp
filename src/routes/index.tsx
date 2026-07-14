@@ -213,24 +213,44 @@ function Home() {
           );
         };
 
-        return rows.map((row, idx) => {
-          const key = row.map((r) => r.s.cat.id).join("|");
-          const content = (
-            <div className="mt-10 grid grid-cols-1 lg:grid-cols-5 gap-6">
-              {row.map(({ s, w }) => (
-                <div key={s.cat.id} className={colSpan[w]}>
-                  {renderSection(s)}
+        const visibleRowsList = rows.slice(0, visibleRows);
+        const hasMoreRows = rows.length > visibleRows;
+
+        return (
+          <>
+            {visibleRowsList.map((row, idx) => {
+              const key = row.map((r) => r.s.cat.id).join("|");
+              const content = (
+                <div className="mt-10 grid grid-cols-1 lg:grid-cols-5 gap-6">
+                  {row.map(({ s, w }) => (
+                    <div key={s.cat.id} className={colSpan[w]}>
+                      {renderSection(s)}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          );
-          if (idx === 0) return <div key={key}>{content}</div>;
-          return (
-            <LazyMount key={key} minHeight={480}>
-              {content}
-            </LazyMount>
-          );
-        });
+              );
+              if (idx === 0) return <div key={key}>{content}</div>;
+              return (
+                <LazyMount key={key} minHeight={480}>
+                  {content}
+                </LazyMount>
+              );
+            })}
+            {hasMoreRows && (
+              <div className="mt-10 flex justify-center">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() =>
+                    setVisibleRows((v) => v + ROWS_INCREMENT)
+                  }
+                >
+                  Carregar mais
+                </Button>
+              </div>
+            )}
+          </>
+        );
       })()}
 
 
