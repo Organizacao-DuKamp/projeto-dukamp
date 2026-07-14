@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload, X, Loader2, Play } from "lucide-react";
@@ -41,11 +41,13 @@ export function ImageUpload({
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  async function handle(files: FileList | null) {
-    if (!files?.[0]) return;
+  async function handle(files: FileList | File[] | null) {
+    if (!files || (files as any).length === 0) return;
+    const first = (files as any)[0] as File;
+    if (!first) return;
     setBusy(true);
     try {
-      const url = await uploadOne(files[0], folder);
+      const url = await uploadOne(first, folder);
       onChange(url);
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao enviar imagem");
@@ -54,6 +56,25 @@ export function ImageUpload({
       if (ref.current) ref.current.value = "";
     }
   }
+
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const imgs: File[] = [];
+      for (const it of Array.from(items)) {
+        if (it.kind === "file" && it.type.startsWith("image/")) {
+          const f = it.getAsFile();
+          if (f) imgs.push(f);
+        }
+      }
+      if (imgs.length === 0) return;
+      e.preventDefault();
+      handle(imgs);
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, []);
 
   return (
     <div className="space-y-2">
@@ -96,12 +117,12 @@ export function ImageListUpload({
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  async function handle(files: FileList | null) {
-    if (!files || files.length === 0) return;
+  async function handle(files: FileList | File[] | null) {
+    if (!files || (files as any).length === 0) return;
     setBusy(true);
     try {
       const urls: string[] = [];
-      for (const f of Array.from(files)) urls.push(await uploadOne(f));
+      for (const f of Array.from(files as any) as File[]) urls.push(await uploadOne(f));
       onChange([...(value ?? []), ...urls]);
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao enviar imagem");
@@ -110,6 +131,25 @@ export function ImageListUpload({
       if (ref.current) ref.current.value = "";
     }
   }
+
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const imgs: File[] = [];
+      for (const it of Array.from(items)) {
+        if (it.kind === "file" && it.type.startsWith("image/")) {
+          const f = it.getAsFile();
+          if (f) imgs.push(f);
+        }
+      }
+      if (imgs.length === 0) return;
+      e.preventDefault();
+      handle(imgs);
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [value]);
 
   function removeAt(i: number) {
     const next = [...(value ?? [])];
@@ -165,12 +205,12 @@ export function MediaListUpload({
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  async function handle(files: FileList | null) {
-    if (!files || files.length === 0) return;
+  async function handle(files: FileList | File[] | null) {
+    if (!files || (files as any).length === 0) return;
     setBusy(true);
     try {
       const urls: string[] = [];
-      for (const f of Array.from(files)) urls.push(await uploadOne(f, folder));
+      for (const f of Array.from(files as any) as File[]) urls.push(await uploadOne(f, folder));
       onChange([...(value ?? []), ...urls]);
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao enviar arquivo");
@@ -179,6 +219,25 @@ export function MediaListUpload({
       if (ref.current) ref.current.value = "";
     }
   }
+
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const files: File[] = [];
+      for (const it of Array.from(items)) {
+        if (it.kind === "file" && (it.type.startsWith("image/") || it.type.startsWith("video/"))) {
+          const f = it.getAsFile();
+          if (f) files.push(f);
+        }
+      }
+      if (files.length === 0) return;
+      e.preventDefault();
+      handle(files);
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [value]);
 
   function removeAt(i: number) {
     const next = [...(value ?? [])];
