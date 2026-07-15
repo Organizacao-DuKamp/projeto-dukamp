@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixOrder, calculateShipping } from "@/lib/checkout.functions";
+import { createPixOrder, calculateShipping, CARD_FEE_TABLE, computePaymentTotals, type CardInstallments } from "@/lib/checkout.functions";
 import { useSiteSettings } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,6 +76,7 @@ function CheckoutPage() {
   const [loadingPay, setLoadingPay] = useState(false);
   const [loadingFrete, setLoadingFrete] = useState(false);
   const [method, setMethod] = useState<"pix" | "card">("pix");
+  const [installments, setInstallments] = useState<CardInstallments>(1);
   const [frete, setFrete] = useState<{ valor: number; prazoDias: number; servico: string; dataMaxima?: string } | null>(null);
   const [freteOpcoes, setFreteOpcoes] = useState<Array<{ valor: number; prazoDias: number; servico: string; dataMaxima?: string }>>([]);
 
@@ -171,7 +172,6 @@ function CheckoutPage() {
   async function handleBuy() {
     const err = validateDelivery();
     if (err) return toast.error(err);
-    if (method !== "pix") return;
     setLoadingPay(true);
     try {
       const r = await createOrder({
@@ -181,9 +181,15 @@ function CheckoutPage() {
           shipping_cost: frete?.valor ?? 0,
           shipping_service: frete?.servico ?? "A combinar",
           shipping_deadline_days: frete?.prazoDias ?? 0,
+          payment_method: method,
+          card_installments: method === "card" ? installments : undefined,
         },
       });
       clear();
+      if (method === "card" && r.redirectUrl) {
+        window.location.href = r.redirectUrl;
+        return;
+      }
       nav({ to: "/pedido/$id", params: { id: r.orderId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar pedido");
@@ -192,7 +198,9 @@ function CheckoutPage() {
     }
   }
 
-  const total = subtotal + (frete?.valor ?? 0);
+  const baseAmount = subtotal + (frete?.valor ?? 0);
+  const totals = computePaymentTotals(baseAmount, method, method === "card" ? installments : null);
+  const total = totals.total;
   const totalItens = items.reduce((n, i) => n + i.quantity, 0);
   const suportePhoneDigits = (settings?.phone ?? "").replace(/\D/g, "");
   const suportePhoneDisplay = settings?.phone || "";
@@ -419,15 +427,61 @@ function CheckoutPage() {
                   </div>
                 </button>
 
-                <div className="flex items-center gap-3 rounded-lg border-2 border-dashed p-4 opacity-60 cursor-not-allowed">
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={() => setMethod("card")}
+                  className={`w-full flex items-center gap-3 rounded-lg border-2 p-4 text-left transition-all ${
+                    method === "card" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
                     <CreditCard className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold">Cartão de crédito</p>
-                    <p className="text-xs text-muted-foreground">Em breve</p>
+                    <p className="text-xs text-muted-foreground">Até 3x — pagamento seguro via Mercado Pago</p>
                   </div>
-                </div>
+                  <div className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${method === "card" ? "border-primary" : "border-muted-foreground/40"}`}>
+                    {method === "card" && <div className="h-2 w-2 rounded-full bg-primary" />}
+                  </div>
+                </button>
+
+                {method === "card" && baseAmount > 0 && (
+                  <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Escolha o parcelamento
+                    </div>
+                    {([1, 2, 3] as CardInstallments[]).map((n) => {
+                      const t = computePaymentTotals(baseAmount, "card", n);
+                      const selected = installments === n;
+                      const parcela = t.total / n;
+                      const label = n === 1 ? "À vista" : `${n}x`;
+                      return (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setInstallments(n)}
+                          className={`w-full flex items-center gap-3 rounded-md border-2 p-3 text-left transition ${
+                            selected ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/50"
+                          }`}
+                        >
+                          <div className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 ${selected ? "border-primary" : "border-muted-foreground/40"}`}>
+                            {selected && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">
+                              {label} de {formatBRL(parcela)}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              Total {formatBRL(t.total)} · taxa {(t.feePct * 100).toFixed(2).replace(".", ",")}%
+                              {" "}({formatBRL(t.feeAmount)})
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </Section>
           </div>
@@ -453,16 +507,27 @@ function CheckoutPage() {
                       Entrega em até <b className="text-foreground">{frete.prazoDias} dia{frete.prazoDias === 1 ? "" : "s"} úte{frete.prazoDias === 1 ? "l" : "is"}</b>
                     </div>
                   )}
+                  {method === "card" && totals.feeAmount > 0 && (
+                    <Row
+                      label={`Taxa cartão (${(totals.feePct * 100).toFixed(2).replace(".", ",")}%)`}
+                      value={formatBRL(totals.feeAmount)}
+                    />
+                  )}
                   <Separator />
                   <div className="flex items-end justify-between">
                     <span className="text-sm font-medium text-muted-foreground">Total</span>
                     <span className="text-2xl sm:text-3xl font-bold text-primary tracking-tight">{formatBRL(total)}</span>
                   </div>
+                  {method === "card" && installments > 1 && (
+                    <div className="text-right text-xs text-muted-foreground">
+                      em {installments}x de <b className="text-foreground">{formatBRL(total / installments)}</b>
+                    </div>
+                  )}
 
                   <Button
                     type="button"
                     onClick={handleBuy}
-                    disabled={loadingPay || method !== "pix"}
+                    disabled={loadingPay}
                     size="lg"
                     className="w-full h-12 text-base font-bold gap-2 mt-2"
                   >

@@ -431,6 +431,32 @@ export const calculateShipping = createServerFn({ method: "POST" })
 
 // ---------- Order + Mercado Pago Pix ----------
 
+// Tabela de taxas do cartão de crédito — canônico no servidor.
+// Frontend só EXIBE; o servidor recalcula do zero e ignora qualquer valor enviado.
+export const CARD_FEE_TABLE = {
+  1: 0.0502, // à vista
+  2: 0.0702,
+  3: 0.0890,
+} as const;
+export type CardInstallments = keyof typeof CARD_FEE_TABLE;
+
+export function computePaymentTotals(
+  base: number,
+  method: "pix" | "card",
+  installments: CardInstallments | null,
+) {
+  const baseAmount = Number(base.toFixed(2));
+  if (method === "pix") {
+    return { baseAmount, feePct: 0, feeAmount: 0, total: baseAmount, installments: null as null };
+  }
+  const inst = (installments ?? 1) as CardInstallments;
+  const feePct = CARD_FEE_TABLE[inst];
+  if (feePct == null) throw new Error("Parcelamento inválido");
+  const total = Number((baseAmount * (1 + feePct)).toFixed(2));
+  const feeAmount = Number((total - baseAmount).toFixed(2));
+  return { baseAmount, feePct, feeAmount, total, installments: inst };
+}
+
 const orderSchema = z.object({
   customer_name: z.string().min(2).max(120),
   email: z.string().email(),
@@ -455,7 +481,10 @@ const orderSchema = z.object({
   shipping_cost: z.number().nonnegative(),
   shipping_service: z.string().min(1),
   shipping_deadline_days: z.number().int().nonnegative(),
+  payment_method: z.enum(["pix", "card"]).default("pix"),
+  card_installments: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
 });
+
 
 export const createPixOrder = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => orderSchema.parse(data))
@@ -509,7 +538,13 @@ export const createPixOrder = createServerFn({ method: "POST" })
       };
     });
 
-    const total = Number((subtotal + data.shipping_cost).toFixed(2));
+    // Cálculo AUTORITATIVO de taxas e total (nunca confie no cliente)
+    const baseAmount = Number((subtotal + data.shipping_cost).toFixed(2));
+    const paymentMethod = data.payment_method ?? "pix";
+    const installments =
+      paymentMethod === "card" ? ((data.card_installments ?? 1) as CardInstallments) : null;
+    const totals = computePaymentTotals(baseAmount, paymentMethod, installments);
+    const total = totals.total;
 
     // Cria ordem
     const { data: order, error: oe } = await supa
@@ -532,9 +567,12 @@ export const createPixOrder = createServerFn({ method: "POST" })
         shipping_service: data.shipping_service,
         shipping_deadline_days: data.shipping_deadline_days,
         total,
-        payment_method: "pix",
+        payment_method: paymentMethod,
         payment_status: "pending",
-      })
+        payment_base_amount: baseAmount,
+        payment_fee: totals.feeAmount,
+        card_installments: totals.installments,
+      } as any)
       .select("*")
       .single();
     if (oe || !order) throw new Error(oe?.message || "Falha ao criar pedido");
@@ -544,7 +582,6 @@ export const createPixOrder = createServerFn({ method: "POST" })
       .insert(orderItems.map((oi) => ({ ...oi, order_id: order.id })));
     if (ie) throw new Error(ie.message);
 
-    // Cria Pix no Mercado Pago
     const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN!;
     if (!mpToken) throw new Error("MERCADO_PAGO_ACCESS_TOKEN ausente");
 
@@ -559,9 +596,76 @@ export const createPixOrder = createServerFn({ method: "POST" })
     const notifBase = process.env.PUBLIC_APP_URL || "https://dukamp.lovable.app";
     const notification_url = `${notifBase.replace(/\/$/, "")}/api/public/mercadopago-webhook`;
 
+    if (paymentMethod === "card") {
+      // ---------- Cartão de Crédito via Mercado Pago Checkout Pro ----------
+      const backUrl = `${notifBase.replace(/\/$/, "")}/pedido/${order.id}`;
+      const inst = totals.installments!;
+      const prefRes = await fetch("https://api.mercadopago.com/checkout/preferences", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${mpToken}`,
+          "Content-Type": "application/json",
+          "X-Idempotency-Key": order.id,
+        },
+        body: JSON.stringify({
+          items: [
+            {
+              id: order.id,
+              title: `Pedido ${order.order_number} - Dukamp`,
+              quantity: 1,
+              currency_id: "BRL",
+              unit_price: total,
+            },
+          ],
+          payer: {
+            email: data.email,
+            first_name: firstName,
+            last_name: lastName,
+            identification: { type: idType, number: cpf },
+          },
+          payment_methods: {
+            excluded_payment_types: [
+              { id: "ticket" },
+              { id: "atm" },
+              { id: "bank_transfer" },
+              { id: "digital_wallet" },
+            ],
+            installments: inst,
+            default_installments: inst,
+          },
+          external_reference: order.id,
+          notification_url,
+          statement_descriptor: "DUKAMP",
+          back_urls: { success: backUrl, failure: backUrl, pending: backUrl },
+          auto_return: "approved",
+        }),
+      });
+      if (!prefRes.ok) {
+        const raw = await prefRes.text();
+        console.error("[MercadoPago] preference recusada", prefRes.status, raw);
+        let mpMsg = "";
+        try {
+          const j = JSON.parse(raw) as { message?: string; cause?: Array<{ description?: string }> };
+          mpMsg = j.cause?.[0]?.description || j.message || "";
+        } catch {}
+        throw new Error(translateMpError(mpMsg));
+      }
+      const pref = (await prefRes.json()) as { id: string; init_point?: string; sandbox_init_point?: string };
+      const redirectUrl = pref.init_point || pref.sandbox_init_point || "";
+      await supa
+        .from("orders")
+        .update({
+          mp_payment_id: pref.id,
+          mp_ticket_url: redirectUrl,
+        })
+        .eq("id", order.id);
+
+      return { orderId: order.id, orderNumber: order.order_number, redirectUrl };
+    }
+
+    // ---------- Pix (fluxo original inalterado) ----------
     const expires = new Date(Date.now() + 30 * 60 * 1000);
-    const expiresIso =
-      expires.toISOString().replace("Z", "-00:00"); // MP exige offset
+    const expiresIso = expires.toISOString().replace("Z", "-00:00");
 
     const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
       method: "POST",
@@ -619,7 +723,7 @@ export const createPixOrder = createServerFn({ method: "POST" })
       })
       .eq("id", order.id);
 
-    return { orderId: order.id, orderNumber: order.order_number };
+    return { orderId: order.id, orderNumber: order.order_number, redirectUrl: null as string | null };
   });
 
 export const getOrderPublic = createServerFn({ method: "GET" })
