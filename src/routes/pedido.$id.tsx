@@ -7,7 +7,7 @@ import { formatBRL, useCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, XCircle, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 export const Route = createFileRoute("/pedido/$id")({
   ssr: false,
