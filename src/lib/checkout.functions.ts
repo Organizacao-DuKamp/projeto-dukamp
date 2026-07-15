@@ -597,70 +597,14 @@ export const createPixOrder = createServerFn({ method: "POST" })
     const notification_url = `${notifBase.replace(/\/$/, "")}/api/public/mercadopago-webhook`;
 
     if (paymentMethod === "card") {
-      // ---------- Cartão de Crédito via Mercado Pago Checkout Pro ----------
-      const backUrl = `${notifBase.replace(/\/$/, "")}/pedido/${order.id}`;
-      const inst = totals.installments!;
-      const prefRes = await fetch("https://api.mercadopago.com/checkout/preferences", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${mpToken}`,
-          "Content-Type": "application/json",
-          "X-Idempotency-Key": order.id,
-        },
-        body: JSON.stringify({
-          items: [
-            {
-              id: order.id,
-              title: `Pedido ${order.order_number} - Dukamp`,
-              quantity: 1,
-              currency_id: "BRL",
-              unit_price: total,
-            },
-          ],
-          payer: {
-            email: data.email,
-            first_name: firstName,
-            last_name: lastName,
-            identification: { type: idType, number: cpf },
-          },
-          payment_methods: {
-            excluded_payment_types: [
-              { id: "ticket" },
-              { id: "atm" },
-              { id: "bank_transfer" },
-              { id: "digital_wallet" },
-            ],
-            installments: inst,
-            default_installments: inst,
-          },
-          external_reference: order.id,
-          notification_url,
-          statement_descriptor: "DUKAMP",
-          back_urls: { success: backUrl, failure: backUrl, pending: backUrl },
-          auto_return: "approved",
-        }),
-      });
-      if (!prefRes.ok) {
-        const raw = await prefRes.text();
-        console.error("[MercadoPago] preference recusada", prefRes.status, raw);
-        let mpMsg = "";
-        try {
-          const j = JSON.parse(raw) as { message?: string; cause?: Array<{ description?: string }> };
-          mpMsg = j.cause?.[0]?.description || j.message || "";
-        } catch {}
-        throw new Error(translateMpError(mpMsg));
-      }
-      const pref = (await prefRes.json()) as { id: string; init_point?: string; sandbox_init_point?: string };
-      const redirectUrl = pref.init_point || pref.sandbox_init_point || "";
-      await supa
-        .from("orders")
-        .update({
-          mp_payment_id: pref.id,
-          mp_ticket_url: redirectUrl,
-        })
-        .eq("id", order.id);
-
-      return { orderId: order.id, orderNumber: order.order_number, redirectUrl };
+      // Cartão de crédito é finalizado inline via Card Payment Brick (tokenização no navegador)
+      // e cobrança pelo servidor em `processCardPayment`. Aqui só criamos o pedido pendente.
+      return {
+        orderId: order.id,
+        orderNumber: order.order_number,
+        redirectUrl: null as string | null,
+        amount: total,
+      };
     }
 
     // ---------- Pix (fluxo original inalterado) ----------
