@@ -172,7 +172,6 @@ function CheckoutPage() {
   async function handleBuy() {
     const err = validateDelivery();
     if (err) return toast.error(err);
-    if (method !== "pix") return;
     setLoadingPay(true);
     try {
       const r = await createOrder({
@@ -182,9 +181,15 @@ function CheckoutPage() {
           shipping_cost: frete?.valor ?? 0,
           shipping_service: frete?.servico ?? "A combinar",
           shipping_deadline_days: frete?.prazoDias ?? 0,
+          payment_method: method,
+          card_installments: method === "card" ? installments : undefined,
         },
       });
       clear();
+      if (method === "card" && r.redirectUrl) {
+        window.location.href = r.redirectUrl;
+        return;
+      }
       nav({ to: "/pedido/$id", params: { id: r.orderId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar pedido");
@@ -193,7 +198,9 @@ function CheckoutPage() {
     }
   }
 
-  const total = subtotal + (frete?.valor ?? 0);
+  const baseAmount = subtotal + (frete?.valor ?? 0);
+  const totals = computePaymentTotals(baseAmount, method, method === "card" ? installments : null);
+  const total = totals.total;
   const totalItens = items.reduce((n, i) => n + i.quantity, 0);
   const suportePhoneDigits = (settings?.phone ?? "").replace(/\D/g, "");
   const suportePhoneDisplay = settings?.phone || "";
