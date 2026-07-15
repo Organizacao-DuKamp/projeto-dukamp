@@ -653,6 +653,32 @@ function CheckoutPage() {
                     })}
                   </div>
                 )}
+
+                {method === "card" && (
+                  <div className="rounded-lg border-2 border-primary/30 bg-background p-4">
+                    <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                      <Lock className="h-4 w-4 text-primary" />
+                      Preencha os dados do cartão
+                    </div>
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      Seus dados são enviados diretamente ao Mercado Pago com criptografia. Nada trafega pelos nossos servidores.
+                    </p>
+                    <div id="dukamp-card-brick" ref={brickContainerRef} />
+                    {!mpSdkReady && !brickError && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Carregando formulário seguro...
+                      </div>
+                    )}
+                    {brickError && (
+                      <p className="mt-2 text-sm text-destructive">{brickError}</p>
+                    )}
+                    {loadingPay && (
+                      <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Processando pagamento...
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </Section>
           </div>
